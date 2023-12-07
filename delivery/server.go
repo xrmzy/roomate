@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"fmt"
 	"log"
 	"roomate/config"
 
@@ -10,11 +9,12 @@ import (
 
 type Server struct {
 	engine *gin.Engine
-	host   string
+	infra  config.InfraConfig
+	cfg    config.Config
 }
 
 func (s *Server) Run() {
-	if err := s.engine.Run(s.host); err != nil {
+	if err := s.engine.Run(s.cfg.DB_HOST); err != nil {
 		log.Fatal("server can't run")
 	}
 }
@@ -26,9 +26,8 @@ func NewServer() *Server {
 	}
 
 	engine := gin.Default()
-	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	return &Server{
 		engine: engine,
-		host:   host,
+		cfg:    cfg,
 	}
 }

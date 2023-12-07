@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE "users" (
   "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
   "name" VARCHAR(100) NOT NULL,
@@ -22,7 +24,7 @@ CREATE TABLE "customers" (
 );
 
 CREATE TABLE "rooms" (
-  "id" VARCHAR(100),
+  "id" VARCHAR(100) PRIMARY KEY,
   "room_number" INT NOT NULL,
   "room_type" VARCHAR(100) NOT NULL,
   "capacity" INT NOT NULL,
@@ -35,7 +37,7 @@ CREATE TABLE "rooms" (
 );
 
 CREATE TABLE "services" (
-  "id" VARCHAR(100),
+  "id" VARCHAR(100) PRIMARY KEY,
   "name" VARCHAR(100),
   "price" BIGINT NOT NULL,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
@@ -62,8 +64,8 @@ CREATE TABLE "bookings" (
 CREATE TABLE "booking_details" (
   "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
   "booking_id" UUID NOT NULL,
-  "room_id" UUID NOT NULL,
-  "services_id" UUID NOT NULL,
+  "room_id" VARCHAR(100),
+  "services_id" VARCHAR(100),
   "sub_total" BIGINT,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" TIMESTAMP NOT NULL,

@@ -13,7 +13,9 @@ type userRepository struct {
 	db *sql.DB
 }
 
-const ()
+const (
+	
+)
 
 func (u *userRepository) Get(id string) (model.User, error) {
 	var user model.User
@@ -37,3 +39,5 @@ func (u *userRepository) Get(id string) (model.User, error) {
 func NewUserRepository(db *sql.DB) UserRepository {
 	return &userRepository{db: db}
 }
+
+
