@@ -2,17 +2,28 @@ package config
 
 import (
 	"log"
+	"time"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	DB_USER     string `mapstructure:"POSTGRES_USER"`
-	DB_PASSWORD string `mapstructure:"POSTGRES_PASSWORD"`
-	DB_HOST     string `mapstructure:"POSTGRES_HOST"`
-	DB_PORT     string `mapstructure:"POSTGRES_PORT"`
+	DB_USER     string `mapstructure:"DB_USER"`
+	DB_PASSWORD string `mapstructure:"DB_PASSWORD"`
+	DB_HOST     string `mapstructure:"DB_HOST"`
+	DB_PORT     string `mapstructure:"DB_PORT"`
 	DB_NAME     string `mapstructure:"DB_NAME"`
 	API_PORT    string `mapstructure:"API_PORT"`
+
+	AccessTokenPrivateKey  string        `mapstructure:"ACCESS_TOKEN_PRIVATE_KEY"`
+	AccessTokenPublicKey   string        `mapstructure:"ACCESS_TOKEN_PUBLIC_KEY"`
+	RefreshTokenPrivateKey string        `mapstructure:"REFRESH_TOKEN_PRIVATE_KEY"`
+	RefreshTokenPublicKey  string        `mapstructure:"REFRESH_TOKEN_PUBLIC_KEY"`
+	AccessTokenExpiresIn   time.Duration `mapstructure:"ACCESS_TOKEN_EXPIRED_IN"`
+	RefreshTokenExpiresIn  time.Duration `mapstructure:"REFRESH_TOKEN_EXPIRED_IN"`
+	AccessTokenMaxAge      int           `mapstructure:"ACCESS_TOKEN_MAXAGE"`
+	RefreshTokenMaxAge     int           `mapstructure:"REFRESH_TOKEN_MAXAGE"`
+
 	FileConfig
 	TokenConfig
 }

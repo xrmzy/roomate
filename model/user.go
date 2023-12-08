@@ -3,15 +3,28 @@ package model
 import "time"
 
 type User struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	RoleID    int       `json:"roleId"`
-	RoleName  string    `json:"roleName"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-	IsDeleted bool      `json:"isDeleted"`
+	ID        string
+	Name      string
+	Email     string
+	Password  string
+	RoleID    int
+	RoleName  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	IsDeleted bool `json:"isDeleted"`
+}
+
+type SignUpInput struct {
+	Name            string `json:"name" binding:"required"`
+	Email           string `json:"email" binding:"required"`
+	Password        string `json:"password" binding:"required, min=8"`
+	PasswordConfirm string `json:"passwordConfirm" binding:"required"`
+	RoleID          int    `json:"roleId" binding:"required"`
+}
+
+type SignInInput struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 // func (u User) IsValidRole() bool {
