@@ -2,14 +2,15 @@ package repository
 
 import (
 	"context"
-	"roomate/model"
+
+	entity "roomate/model/entity"
 	"roomate/utils/query"
 	"time"
 )
 
-func (q *Queries) GetUserById(ctx context.Context, id string) (model.User, error) {
+func (q *Queries) GetUserById(ctx context.Context, id string) (entity.User, error) {
 	row := q.db.QueryRowContext(ctx, query.GetUserById, id)
-	var user model.User
+	var user entity.User
 	err := row.Scan(
 		&user.ID,
 		&user.Name,
@@ -23,9 +24,9 @@ func (q *Queries) GetUserById(ctx context.Context, id string) (model.User, error
 	return user, err
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg model.User) (model.User, error) {
+func (q *Queries) CreateUser(ctx context.Context, arg entity.User) (entity.User, error) {
 	row := q.db.QueryRowContext(ctx, query.CreateUser, arg.Name, arg.Email, arg.Password, arg.RoleID, time.Now())
-	var user model.User
+	var user entity.User
 	err := row.Scan(
 		&user.ID,
 		&user.Name,
@@ -40,15 +41,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg model.User) (model.User, e
 	return user, err
 }
 
-func (q *Queries) ListUsers(ctx context.Context) ([]model.User, error) {
+func (q *Queries) ListUsers(ctx context.Context) ([]entity.User, error) {
 	rows, err := q.db.QueryContext(ctx, query.ListUsers)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var users []model.User
+	var users []entity.User
 	for rows.Next() {
-		var user model.User
+		var user entity.User
 		if err := rows.Scan(
 			&user.ID,
 			&user.Name,
@@ -68,7 +69,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]model.User, error) {
 	return users, nil
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg model.User) error {
+func (q *Queries) UpdateUser(ctx context.Context, arg entity.User) error {
 	_, err := q.db.ExecContext(ctx, query.UpdateUser,
 		arg.ID,
 		arg.Name,

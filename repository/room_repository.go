@@ -2,14 +2,14 @@ package repository
 
 import (
 	"context"
-	"roomate/model"
+	"roomate/model/entity"
 	"roomate/utils/query"
 	"time"
 )
 
-func (q *Queries) GetRoomById(ctx context.Context, id string) (model.Rooms, error) {
+func (q *Queries) GetRoomById(ctx context.Context, id string) (entity.Room, error) {
 	row := q.db.QueryRowContext(ctx, query.GetRoomById, id)
-	var room model.Rooms
+	var room entity.Room
 	err := row.Scan(
 		&room.ID,
 		&room.RoomNumber,
@@ -25,10 +25,10 @@ func (q *Queries) GetRoomById(ctx context.Context, id string) (model.Rooms, erro
 	return room, err
 }
 
-func (q *Queries) CreateRoom(ctx context.Context, arg model.Rooms) (model.Rooms, error) {
+func (q *Queries) CreateRoom(ctx context.Context, arg entity.Room) (entity.Room, error) {
 	row := q.db.QueryRowContext(ctx, query.CreateRoom, arg.ID, arg.RoomNumber, arg.RoomType,
 		arg.Capacity, arg.Facility, arg.Price, arg.Status, time.Now())
-	var room model.Rooms
+	var room entity.Room
 	err := row.Scan(
 		&room.ID,
 		&room.RoomNumber,
@@ -44,15 +44,15 @@ func (q *Queries) CreateRoom(ctx context.Context, arg model.Rooms) (model.Rooms,
 	return room, err
 }
 
-func (q *Queries) ListRooms(ctx context.Context) ([]model.Rooms, error) {
+func (q *Queries) ListRooms(ctx context.Context) ([]entity.Room, error) {
 	rows, err := q.db.QueryContext(ctx, query.ListRooms)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var rooms []model.Rooms
+	var Room []entity.Room
 	for rows.Next() {
-		var room model.Rooms
+		var room entity.Room
 		if err := rows.Scan(
 			&room.ID,
 			&room.RoomNumber,
@@ -66,15 +66,15 @@ func (q *Queries) ListRooms(ctx context.Context) ([]model.Rooms, error) {
 		); err != nil {
 			return nil, err
 		}
-		rooms = append(rooms, room)
+		Room = append(Room, room)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return rooms, nil
+	return Room, nil
 }
 
-func (q *Queries) UpdateRoom(ctx context.Context, arg model.Rooms) error {
+func (q *Queries) UpdateRoom(ctx context.Context, arg entity.Room) error {
 	_, err := q.db.ExecContext(ctx, query.UpdateRoom,
 		arg.ID, arg.RoomNumber, arg.RoomType,
 		arg.Capacity, arg.Facility, arg.Price, arg.Status, time.Now(),
