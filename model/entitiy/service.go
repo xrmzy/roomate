@@ -3,10 +3,10 @@ package entity
 import "time"
 
 type Service struct {
-	ID        int
-	Name      string
-	Price     int
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	IsDeleted bool
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	Price     int       `json:"price"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	IsDeleted bool      `json:"isDeleted"`
 }
