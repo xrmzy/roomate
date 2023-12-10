@@ -72,8 +72,16 @@ CREATE TABLE "booking_details" (
   "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
   "booking_id" UUID NOT NULL,
   "room_id" UUID NOT NULL,
-  "service_id" UUID NOT NULL,
   "sub_total" BIGINT,
+  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
+  "updated_at" TIMESTAMP NOT NULL,
+  "is_deleted" BOOL DEFAULT false
+);
+
+CREATE TABLE "booking_detail_services" (
+  "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
+  "booking_detail_id" UUID NOT NULL,
+  "service_id" UUID NOT NULL,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" TIMESTAMP NOT NULL,
   "is_deleted" BOOL DEFAULT false
@@ -87,6 +95,6 @@ ALTER TABLE "booking_details" ADD FOREIGN KEY ("booking_id") REFERENCES "booking
 
 ALTER TABLE "booking_details" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
 
-ALTER TABLE "booking_details" ADD FOREIGN KEY ("service_id") REFERENCES "services" ("id");
-
 ALTER TABLE "users" ADD FOREIGN KEY ("role_id") REFERENCES "roles" ("id");
+
+ALTER TABLE "booking_detail_services" ADD FOREIGN KEY ("booking_detail_id") REFERENCES "booking_details" ("id");
