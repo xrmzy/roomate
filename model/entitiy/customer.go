@@ -1,10 +1,14 @@
 package entity
 
+import "time"
+
 type Customer struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	Address     string `json:"address"`
-	PhoneNumber string `json:"phoneNumber"`
-	IsDeleted   bool   `json:"isDeleted"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	Address     string    `json:"address"`
+	PhoneNumber string    `json:"phoneNumber"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	IsDeleted   bool      `json:"isDeleted"`
 }
