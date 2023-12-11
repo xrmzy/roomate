@@ -60,8 +60,8 @@ CREATE TABLE "bookings" (
   "check_out" DATE NOT NULL,
   "user_id" UUID NOT NULL,
   "customer_id" UUID NOT NULL,
-  "is_agree" BOOL,
-  "information" VARCHAR,
+  "is_agree" BOOL DEFAULT false,
+  "information" VARCHAR DEFAULT 'Pending',
   "total_price" BIGINT,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" TIMESTAMP NOT NULL,
@@ -82,6 +82,7 @@ CREATE TABLE "booking_detail_services" (
   "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
   "booking_detail_id" UUID NOT NULL,
   "service_id" UUID NOT NULL,
+  "service_name" VARCHAR,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" TIMESTAMP NOT NULL,
   "is_deleted" BOOL DEFAULT false
@@ -98,3 +99,5 @@ ALTER TABLE "booking_details" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("i
 ALTER TABLE "users" ADD FOREIGN KEY ("role_id") REFERENCES "roles" ("id");
 
 ALTER TABLE "booking_detail_services" ADD FOREIGN KEY ("booking_detail_id") REFERENCES "booking_details" ("id");
+
+ALTER TABLE "booking_detail_services" ADD FOREIGN KEY ("service_id") REFERENCES "services" ("id");
