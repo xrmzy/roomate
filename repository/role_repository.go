@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	entity "roomate/model/entitiy"
+	"roomate/model/entity"
 	"roomate/utils/query"
 	"time"
 )
