@@ -1,43 +1,87 @@
 package repository
 
-// import (
-// 	"database/sql"
-// 	"roomate/model"
-// )
+import (
+	"context"
 
-// type UserRepository interface {
-// 	Get(id string) (model.User, error)
-// }
+	"roomate/model/entity"
+	"roomate/utils/query"
+	"time"
+)
 
-// type userRepository struct {
-// 	db *sql.DB
-// }
+func (q *Queries) GetUserById(ctx context.Context, id string) (entity.User, error) {
+	row := q.db.QueryRowContext(ctx, query.GetUserById, id)
+	var user entity.User
+	err := row.Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.RoleID,
+		&user.RoleName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
 
-// const (
+	return user, err
+}
 
-// )
+func (q *Queries) CreateUser(ctx context.Context, arg entity.User) (entity.User, error) {
+	row := q.db.QueryRowContext(ctx, query.CreateUser, arg.Name, arg.Email, arg.Password, arg.RoleID, time.Now())
+	var user entity.User
+	err := row.Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.RoleID,
+		&user.RoleName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
 
-// func (u *userRepository) Get(id string) (model.User, error) {
-// 	var user model.User
-// 	err := u.db.QueryRow(`SELECT id, name, email, password, role_id, role_name, created_at, updated_at WHERE id = $1 AND is_deleted = false`, id).Scan(
-// 		&user.ID,
-// 		&user.Name,
-// 		&user.Email,
-// 		&user.Password,
-// 		&user.RoleID,
-// 		&user.RoleName,
-// 		&user.CreatedAt,
-// 		&user.UpdatedAt,
-// 	)
+	return user, err
+}
 
-// 	if err != nil {
-// 		return model.User{}, err
-// 	}
-// 	return user, nil
-// }
+func (q *Queries) ListUsers(ctx context.Context) ([]entity.User, error) {
+	rows, err := q.db.QueryContext(ctx, query.ListUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var users []entity.User
+	for rows.Next() {
+		var user entity.User
+		if err := rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Email,
+			&user.RoleID,
+			&user.RoleName,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
 
-// func NewUserRepository(db *sql.DB) UserRepository {
-// 	return &userRepository{db: db}
-// }
+func (q *Queries) UpdateUser(ctx context.Context, arg entity.User) error {
+	_, err := q.db.ExecContext(ctx, query.UpdateUser,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.Password,
+		arg.RoleID,
+		time.Now(),
+	)
+	return err
+}
 
-
+func (q *Queries) DeleteUser(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, query.DeleteUser, id)
+	return err
+}
