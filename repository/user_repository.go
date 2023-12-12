@@ -1,87 +1,176 @@
 package repository
 
 import (
-	"context"
-
+	"database/sql"
 	"roomate/model/entity"
-	"roomate/utils/query"
+	query "roomate/utils/common"
 	"time"
 )
 
-func (q *Queries) GetUserById(ctx context.Context, id string) (entity.User, error) {
-	row := q.db.QueryRowContext(ctx, query.GetUserById, id)
-	var user entity.User
-	err := row.Scan(
-		&user.ID,
-		&user.Name,
-		&user.Email,
-		&user.RoleID,
-		&user.RoleName,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-	)
-
-	return user, err
+type UserRepository interface {
+	Get(id string) (entity.User, error)
+	GetAll(limit, offset int) ([]entity.User, error)
+	GetByEmail(email string) (entity.User, error)
+	Create(user entity.User) (entity.User, error)
+	Update(id string, user entity.User) (entity.User, error)
+	UpdatePassword(id, password string) (entity.User, error)
+	Delete(id string) error
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg entity.User) (entity.User, error) {
-	row := q.db.QueryRowContext(ctx, query.CreateUser, arg.Name, arg.Email, arg.Password, arg.RoleID, time.Now())
-	var user entity.User
-	err := row.Scan(
-		&user.ID,
-		&user.Name,
-		&user.Email,
-		&user.Password,
-		&user.RoleID,
-		&user.RoleName,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-	)
-
-	return user, err
+type userRepository struct {
+	db *sql.DB
 }
 
-func (q *Queries) ListUsers(ctx context.Context) ([]entity.User, error) {
-	rows, err := q.db.QueryContext(ctx, query.ListUsers)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var users []entity.User
-	for rows.Next() {
-		var user entity.User
-		if err := rows.Scan(
-			&user.ID,
+func (u *userRepository) Get(id string) (entity.User, error) {
+	var user entity.User
+	err := u.db.QueryRow(query.GetUser, id).
+		Scan(
+			&user.Id,
 			&user.Name,
 			&user.Email,
-			&user.RoleID,
+			&user.RoleId,
 			&user.RoleName,
 			&user.CreatedAt,
 			&user.UpdatedAt,
-		); err != nil {
-			return nil, err
+			&user.IsDeleted)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (u *userRepository) GetAll(limit, offset int) ([]entity.User, error) {
+	var users []entity.User
+	rows, err := u.db.Query(query.GetAllUsers, limit, offset)
+
+	if err != nil {
+		return users, err
+	}
+
+	for rows.Next() {
+		var user entity.User
+		err := rows.Scan(
+			&user.Id,
+			&user.Name,
+			&user.Email,
+			&user.RoleId,
+			&user.RoleName,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.IsDeleted)
+
+		if err != nil {
+			return users, err
 		}
+
 		users = append(users, user)
 	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
+
 	return users, nil
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg entity.User) error {
-	_, err := q.db.ExecContext(ctx, query.UpdateUser,
-		arg.ID,
-		arg.Name,
-		arg.Email,
-		arg.Password,
-		arg.RoleID,
-		time.Now(),
-	)
-	return err
+func (u *userRepository) GetByEmail(email string) (entity.User, error) {
+	var user entity.User
+	err := u.db.QueryRow(query.GetByEmail, email).
+		Scan(
+			&user.Id,
+			&user.RoleName,
+			&user.Password,
+		)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }
 
-func (q *Queries) DeleteUser(ctx context.Context, id string) error {
-	_, err := q.db.ExecContext(ctx, query.DeleteUser, id)
-	return err
+func (u *userRepository) Create(user entity.User) (entity.User, error) {
+	err := u.db.QueryRow(query.CreateUser,
+		user.Name,
+		user.Email,
+		user.Password,
+		user.RoleId,
+		user.RoleName,
+		time.Now(),
+	).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Email,
+		&user.RoleId,
+		&user.RoleName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&user.IsDeleted,
+	)
+
+	if err != nil {
+		return user, err
+	}
+
+	user.Password = ""
+
+	return user, nil
+}
+
+func (u *userRepository) Update(id string, user entity.User) (entity.User, error) {
+	err := u.db.QueryRow(query.UpdateUser,
+		id,
+		user.Name,
+		user.Email,
+		user.RoleId,
+		user.RoleName,
+		time.Now(),
+	).Scan(
+		&user.Id,
+		&user.Email,
+		&user.RoleId,
+		&user.RoleName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&user.IsDeleted,
+	)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (u *userRepository) UpdatePassword(id, password string) (entity.User, error) {
+	var user entity.User
+	err := u.db.QueryRow(query.UpdatePassword, id, password).
+		Scan(
+			&user.Id,
+			&user.Name,
+			&user.Email,
+			&user.RoleId,
+			&user.RoleName,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.IsDeleted,
+		)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (u *userRepository) Delete(id string) error {
+	_, err := u.db.Exec(query.DeleteUser, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func NewUserRepository(db *sql.DB) UserRepository {
+	return &userRepository{
+		db: db,
+	}
 }

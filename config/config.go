@@ -1,59 +1,83 @@
 package config
 
-// import (
-// 	"errors"
-// 	"os"
+import (
+	"errors"
+	"os"
+	"time"
 
-// 	"github.com/joho/godotenv"
-// )
+	"github.com/joho/godotenv"
+)
 
-// type ApiConfig struct {
-// 	ApiPort string
-// }
+type ApiConfig struct {
+	ApiPort string
+}
 
-// type DbConfig struct {
-// 	Host     string
-// 	Port     string
-// 	Name     string
-// 	User     string
-// 	Password string
-// 	Driver   string
-// }
+type DbConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DbName   string
+	Driver   string
+}
 
-// type Config struct {
-// 	ApiConfig
-// 	DbConfig
-// }
+type FileConfig struct {
+	FilePath string
+}
 
-// func (c *Config) readConfig() error {
-// 	if err := godotenv.Load(); err != nil {
-// 		return err
-// 	}
-// 	c.ApiConfig = ApiConfig{
-// 		ApiPort: os.Getenv("API_PORT"),
-// 	}
+type TokenConfig struct {
+	JwtSignatureKey []byte
+	JwtLifeTime     time.Duration
+}
 
-// 	c.DbConfig = DbConfig{
-// 		Host:     os.Getenv("DB_HOST"),
-// 		Port:     os.Getenv("DB_PORT"),
-// 		Name:     os.Getenv("DB_NAME"),
-// 		User:     os.Getenv("DB_USER"),
-// 		Password: os.Getenv("DB_PASSWORD"),
-// 		Driver:   os.Getenv("DB_DRIVER"),
-// 	}
+type Config struct {
+	ApiConfig
+	DbConfig
+	FileConfig
+	TokenConfig
+}
 
-// 	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" {
-// 		return errors.New("Environment Required")
-// 	}
+func (c *Config) readConfig() error {
+	if err := godotenv.Load(); err != nil {
+		panic("Error loading .env file")
+	}
 
-// 	return nil
-// }
+	c.ApiConfig = ApiConfig{
+		ApiPort: os.Getenv("API_PORT"),
+	}
 
-// func NewConfig() (*Config, error) {
-// 	cfg := &Config{}
-// 	if err := cfg.readConfig(); err != nil {
-// 		return nil, err
-// 	}
+	c.DbConfig = DbConfig{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Username: os.Getenv("DB_USERNAME"),
+		Password: os.Getenv("DB_PASSWORD"),
+		DbName:   os.Getenv("DB_NAME"),
+		Driver:   os.Getenv("DB_DRIVER"),
+	}
 
-// 	return cfg, nil
-// }
+	c.FileConfig = FileConfig{FilePath: os.Getenv("LOG_FILE")}
+
+	tokenLifeTime, err := time.ParseDuration(os.Getenv("TOKEN_LIFE_TIME"))
+	if err != nil {
+		return err
+	}
+
+	c.TokenConfig = TokenConfig{
+		JwtSignatureKey: []byte(os.Getenv("JWT_SIGNATURE_KEY")),
+		JwtLifeTime:     tokenLifeTime,
+	}
+
+	if c.ApiConfig.ApiPort == "" || c.DbConfig.Driver == "" || c.DbConfig.Host == "" || c.DbConfig.DbName == "" || c.DbConfig.Port == "" || c.DbConfig.Username == "" || c.DbConfig.Password == "" {
+		return errors.New("all environment variables required")
+	}
+
+	return nil
+}
+
+func NewConfig() (*Config, error) {
+	cfg := &Config{}
+	if err := cfg.readConfig(); err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}

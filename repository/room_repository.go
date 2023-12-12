@@ -1,60 +1,30 @@
 package repository
 
 import (
-	"context"
+	"database/sql"
 	"roomate/model/entity"
-	"roomate/utils/query"
+	"roomate/utils/common"
+	query "roomate/utils/common"
 	"time"
 )
 
-func (q *Queries) GetRoomById(ctx context.Context, id string) (entity.Room, error) {
-	row := q.db.QueryRowContext(ctx, query.GetRoomById, id)
-	var room entity.Room
-	err := row.Scan(
-		&room.ID,
-		&room.RoomNumber,
-		&room.RoomType,
-		&room.Capacity,
-		&room.Facility,
-		&room.Price,
-		&room.Status,
-		&room.CreatedAt,
-		&room.UpdatedAt,
-	)
-
-	return room, err
+type RoomRepository interface {
+	Get(id string) (entity.Room, error)
+	GetAll(limit, offset int) ([]entity.Room, error)
+	Create(room entity.Room) (entity.Room, error)
+	Update(id string, room entity.Room) (entity.Room, error)
+	Delete(id string) error
 }
 
-func (q *Queries) CreateRoom(ctx context.Context, arg entity.Room) (entity.Room, error) {
-	row := q.db.QueryRowContext(ctx, query.CreateRoom, arg.ID, arg.RoomNumber, arg.RoomType,
-		arg.Capacity, arg.Facility, arg.Price, arg.Status, time.Now())
-	var room entity.Room
-	err := row.Scan(
-		&room.ID,
-		&room.RoomNumber,
-		&room.RoomType,
-		&room.Capacity,
-		&room.Facility,
-		&room.Price,
-		&room.Status,
-		&room.CreatedAt,
-		&room.UpdatedAt,
-	)
-
-	return room, err
+type roomRepository struct {
+	db *sql.DB
 }
 
-func (q *Queries) ListRooms(ctx context.Context) ([]entity.Room, error) {
-	rows, err := q.db.QueryContext(ctx, query.ListRooms)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var Room []entity.Room
-	for rows.Next() {
-		var room entity.Room
-		if err := rows.Scan(
-			&room.ID,
+func (r *roomRepository) Get(id string) (entity.Room, error) {
+	var room entity.Room
+	err := r.db.QueryRow(query.GetRoom, id).
+		Scan(
+			&room.Id,
 			&room.RoomNumber,
 			&room.RoomType,
 			&room.Capacity,
@@ -63,26 +33,118 @@ func (q *Queries) ListRooms(ctx context.Context) ([]entity.Room, error) {
 			&room.Status,
 			&room.CreatedAt,
 			&room.UpdatedAt,
-		); err != nil {
-			return nil, err
+			&room.IsDeleted)
+
+	if err != nil {
+		return room, err
+	}
+
+	return room, nil
+}
+
+func (r *roomRepository) GetAll(limit, offset int) ([]entity.Room, error) {
+	var rooms []entity.Room
+
+	rows, err := r.db.Query(query.GetAllRooms, limit, offset)
+	if err != nil {
+		return rooms, err
+	}
+
+	for rows.Next() {
+		var room entity.Room
+		err := rows.Scan(
+			&room.Id,
+			&room.RoomNumber,
+			&room.RoomType,
+			&room.Capacity,
+			&room.Facility,
+			&room.Price,
+			&room.Status,
+			&room.CreatedAt,
+			&room.UpdatedAt,
+			&room.IsDeleted)
+
+		if err != nil {
+			return rooms, err
 		}
-		Room = append(Room, room)
+
+		rooms = append(rooms, room)
 	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return Room, nil
+
+	return rooms, nil
 }
 
-func (q *Queries) UpdateRoom(ctx context.Context, arg entity.Room) error {
-	_, err := q.db.ExecContext(ctx, query.UpdateRoom,
-		arg.ID, arg.RoomNumber, arg.RoomType,
-		arg.Capacity, arg.Facility, arg.Price, arg.Status, time.Now(),
-	)
-	return err
+func (r *roomRepository) Create(room entity.Room) (entity.Room, error) {
+	room.Id = common.GenerateRoomID("R") // Membuat ID dengan prefiks "R"
+
+	err := r.db.QueryRow(query.CreateRoom,
+		room.Id,
+		room.RoomNumber,
+		room.RoomType,
+		room.Capacity,
+		room.Facility,
+		room.Price,
+		"available",
+		time.Now(),
+	).Scan(
+		&room.Id,
+		&room.RoomNumber,
+		&room.RoomType,
+		&room.Capacity,
+		&room.Facility,
+		&room.Price,
+		&room.Status,
+		&room.CreatedAt,
+		&room.UpdatedAt,
+		&room.IsDeleted)
+
+	if err != nil {
+		return room, err
+	}
+
+	return room, nil
 }
 
-func (q *Queries) DeleteRoom(ctx context.Context, id string) error {
-	_, err := q.db.ExecContext(ctx, query.DeleteRoom, id)
-	return err
+func (r *roomRepository) Update(id string, room entity.Room) (entity.Room, error) {
+	err := r.db.QueryRow(query.UpdateRoom,
+		id,
+		room.RoomNumber,
+		room.RoomType,
+		room.Capacity,
+		room.Facility,
+		room.Price,
+		room.Status,
+		time.Now(),
+	).Scan(
+		&room.Id,
+		&room.RoomNumber,
+		&room.RoomType,
+		&room.Capacity,
+		&room.Facility,
+		&room.Price,
+		&room.Status,
+		&room.CreatedAt,
+		&room.UpdatedAt,
+		&room.IsDeleted)
+
+	if err != nil {
+		return room, err
+	}
+
+	return room, nil
+}
+
+func (r *roomRepository) Delete(id string) error {
+	_, err := r.db.Exec(query.DeleteRoom, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func NewRoomRepository(db *sql.DB) RoomRepository {
+	return &roomRepository{
+		db: db,
+	}
 }

@@ -1,131 +1,134 @@
 package repository
 
 import (
-	"context"
+	"database/sql"
 	"roomate/model/entity"
-	"roomate/utils/query"
+	query "roomate/utils/common"
 	"time"
 )
 
-// const (
-// 	createCustomer = `INSERT INTO customers
-// 	(name, email, address, phone_number, updated_at,)
-// 	VALUES $1, $2, $3, $4, $5`
+type CustomerRepository interface {
+	Get(id string) (entity.Customer, error)
+	GetAll(limit, offset int) ([]entity.Customer, error)
+	Create(customer entity.Customer) (entity.Customer, error)
+	Update(id string, customer entity.Customer) (entity.Customer, error)
+	Delete(id string) error
+}
 
-// 	updateCustomer = `UPDATE customers
-// 	SET
-// 		name = $2,
-// 		email = $3,
-// 		address = $4,
-// 		phone_number = $5,
-// 		updated_at = $6
-// 	WHERE id = $1
-// 	RETURNING id, name, email, address, phone_number, created_at, updated_at
-// 	`
+type customerRepository struct {
+	db *sql.DB
+}
 
-// 	getAllCustomer = `SELECT
-// 		(name, email, address, phone_number, created_at, updated_at)
-// 	FROM
-// 		customers
-// 	WHERE is_deleted = false`
-
-// 	getCustomerByID = `SELECT
-// 	(name, email, address, phone_number, created_at, updated_at)
-// FROM
-// 	customers
-// WHERE id = $1 AND is_deleted = false`
-
-// 	deleteCustomer = `UPDATE customers
-// 	SET
-// 		is_deleted = true
-// 	WHERE id = $1
-// 	`
-// )
-
-func (q *Queries) CreateCustomer(ctx context.Context, payload entity.Customer) (entity.Customer, error) {
-	payload.IsDeleted = false
+func (r *customerRepository) Get(id string) (entity.Customer, error) {
 	var customer entity.Customer
-	err := q.db.QueryRowContext(ctx, query.CreateCustomer, payload.ID, payload.Name, payload.Email, payload.Address, payload.PhoneNumber, time.Now(), time.Now(), payload.IsDeleted).Scan(
-		&customer.ID,
-		&customer.Name,
-		&customer.Email,
-		&customer.Address,
-		&customer.PhoneNumber,
-		&customer.CreatedAt,
-		&customer.UpdatedAt,
-		&customer.CreatedAt,
-		&customer.IsDeleted,
-	)
-
-	if err != nil {
-		return entity.Customer{}, err
-	}
-
-	return customer, nil
-}
-
-func (q *Queries) UpdateCustomer(ctx context.Context, customer entity.Customer) (entity.Customer, error) {
-	_, err := q.db.ExecContext(ctx, query.UpdateCustomer, customer.Name, customer.Email, customer.Address, customer.PhoneNumber, time.Now(), customer.ID)
-
-	if err != nil {
-		return entity.Customer{}, err
-	}
-	return customer, nil
-}
-
-func (q *Queries) GetAllCustomer(ctx context.Context) ([]entity.Customer, error) {
-	var customers []entity.Customer
-
-	rows, err := q.db.QueryContext(ctx, query.GetAllCustomer)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var customer entity.Customer
-		err := rows.Scan(
-			&customer.ID,
+	err := r.db.QueryRow(query.GetCustomer, id).
+		Scan(
+			&customer.Id,
 			&customer.Name,
 			&customer.Email,
 			&customer.Address,
 			&customer.PhoneNumber,
 			&customer.CreatedAt,
 			&customer.UpdatedAt,
+			&customer.IsDeleted)
+
+	if err != nil {
+		return customer, err
+	}
+
+	return customer, nil
+}
+
+func (r *customerRepository) GetAll(limit, offset int) ([]entity.Customer, error) {
+	var customers []entity.Customer
+
+	rows, err := r.db.Query(query.GetAllCustomers, limit, offset)
+	if err != nil {
+		return customers, err
+	}
+
+	for rows.Next() {
+		var customer entity.Customer
+		err := rows.Scan(
+			&customer.Id,
+			&customer.Name,
+			&customer.Email,
+			&customer.Address,
+			&customer.PhoneNumber,
 			&customer.CreatedAt,
-			&customer.IsDeleted,
-		)
+			&customer.UpdatedAt,
+			&customer.IsDeleted)
+
 		if err != nil {
-			return []entity.Customer{}, err
+			return customers, err
 		}
+
 		customers = append(customers, customer)
 	}
+
 	return customers, nil
 }
 
-func (q *Queries) GetCustomerByID(ctx context.Context, customerID string) (entity.Customer, error) {
-	var customer entity.Customer
-	err := q.db.QueryRowContext(ctx, query.GetCustomerByID, customerID).Scan(
-		&customer.ID,
+func (r *customerRepository) Create(customer entity.Customer) (entity.Customer, error) {
+	err := r.db.QueryRow(query.CreateCustomer,
+		customer.Name,
+		customer.Email,
+		customer.Address,
+		customer.PhoneNumber,
+		time.Now(),
+	).Scan(
+		&customer.Id,
 		&customer.Name,
 		&customer.Email,
 		&customer.Address,
 		&customer.PhoneNumber,
 		&customer.CreatedAt,
 		&customer.UpdatedAt,
-		&customer.CreatedAt,
-		&customer.IsDeleted,
-	)
+		&customer.IsDeleted)
+
 	if err != nil {
-		return entity.Customer{}, err
+		return customer, err
 	}
+
 	return customer, nil
 }
 
-func (q *Queries) DeleteCustomer(ctx context.Context, customerID string) error {
-	_, err := q.db.ExecContext(ctx, query.DeleteCustomer, customerID)
+func (r *customerRepository) Update(id string, customer entity.Customer) (entity.Customer, error) {
+	err := r.db.QueryRow(query.UpdateCustomer,
+		id,
+		customer.Name,
+		customer.Email,
+		customer.Address,
+		customer.PhoneNumber,
+		time.Now(),
+	).Scan(
+		&customer.Id,
+		&customer.Name,
+		&customer.Email,
+		&customer.Address,
+		&customer.PhoneNumber,
+		&customer.CreatedAt,
+		&customer.UpdatedAt,
+		&customer.IsDeleted)
+
+	if err != nil {
+		return customer, err
+	}
+
+	return customer, nil
+}
+
+func (r *customerRepository) Delete(id string) error {
+	_, err := r.db.Exec(query.DeleteCustomer, id)
 	if err != nil {
 		return err
 	}
+
 	return nil
+}
+
+func NewCustomerRepository(db *sql.DB) CustomerRepository {
+	return &customerRepository{
+		db: db,
+	}
 }

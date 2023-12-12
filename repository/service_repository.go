@@ -1,211 +1,125 @@
 package repository
 
 import (
-	"context"
+	"database/sql"
 	"roomate/model/entity"
-
-	"roomate/utils/query"
+	"roomate/utils/common"
+	query "roomate/utils/common"
 	"time"
 )
 
-// type ServiceRepository interface {
-// 	GetService(id string) (model.Service, error)
-// 	CreateService(payload model.Service) (model.Service, error)
-// 	UpdateService(payload model.Service) (model.Service, error)
-// 	DeleteService(id string) (model.Service, error)
-// 	ListService() ([]model.Service, error)
-// }
+type ServiceRepository interface {
+	Get(id string) (entity.Service, error)
+	GetAll(limit, offset int) ([]entity.Service, error)
+	Create(service entity.Service) (entity.Service, error)
+	Update(id string, service entity.Service) (entity.Service, error)
+	Delete(id string) error
+}
 
-// type serviceRepository struct {
-// 	db *sql.DB
-// }
+type serviceRepository struct {
+	db *sql.DB
+}
 
-// func (s *serviceRepository) GetService(id string) (model.Service, error) {
-// 	var service model.Service
-// 	err := s.db.QueryRow(query.GetService, id).Scan(
-// 		&service.Id,
-// 		&service.Name,
-// 		&service.Price,
-// 		&service.CreatedAt,
-// 		&service.UpdatedAt,
-// 	)
-// 	if err != nil {
-// 		return model.Service{}, err
-// 	}
-
-// 	return service, nil
-// }
-
-// func (s *serviceRepository) CreateService(payload model.Service) (model.Service, error) {
-// 	payload.IsDeleted = false
-// 	var service model.Service
-// 	err := s.db.QueryRow(query.CreateService, payload.Id, payload.Name, payload.Price, time.Now(), time.Now(), payload.IsDeleted).Scan(
-// 		&service.Id,
-// 		&service.Name,
-// 		&service.Price,
-// 		&service.CreatedAt,
-// 		&service.UpdatedAt,
-// 	)
-
-// 	if err != nil {
-// 		return model.Service{}, err
-// 	}
-
-// 	return service, nil
-// }
-
-// func (s *serviceRepository) UpdateService(payload model.Service) (model.Service, error) {
-// 	var service model.Service
-// 	err := s.db.QueryRow(query.UpdateService,
-// 		payload.Id, payload.Name, payload.Price, time.Now()).
-// 		Scan(
-// 			&service.Id,
-// 			&service.Name,
-// 			&service.Price,
-// 			&service.CreatedAt,
-// 			&service.UpdatedAt,
-// 		)
-
-// 	if err != nil {
-// 		return model.Service{}, err
-// 	}
-
-// 	return service, nil
-// }
-
-// func (s *serviceRepository) DeleteService(id string) (model.Service, error) {
-// 	var service model.Service
-// 	err := s.db.QueryRow(query.DeleteService, id).
-// 		Scan(
-// 			&service.Id,
-// 			&service.Name,
-// 			&service.Price,
-// 			&service.CreatedAt,
-// 			&service.UpdatedAt,
-// 		)
-
-// 	if err != nil {
-// 		return model.Service{}, err
-// 	}
-
-// 	return service, nil
-// }
-
-// func (s *serviceRepository) ListService() ([]model.Service, error) {
-// 	rows, err := s.db.Query(query.ListService)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
-
-// 	var services []model.Service
-
-// 	for rows.Next() {
-// 		var service model.Service
-// 		if err := rows.Scan(
-// 			&service.Id,
-// 			&service.Name,
-// 			&service.Price,
-// 			&service.CreatedAt,
-// 			&service.UpdatedAt,
-// 		); err != nil {
-// 			return nil, err
-// 		}
-// 		services = append(services, service)
-// 	}
-
-// 	if err := rows.Err(); err != nil {
-// 		return nil, err
-// 	}
-
-// 	return services, nil
-// }
-
-// func NewServiceRepository(db *sql.DB) ServiceRepository {
-// 	return &serviceRepository{db: db}
-// }
-
-func (s *Queries) GetService(ctx context.Context, id string) (entity.Service, error) {
+func (r *serviceRepository) Get(id string) (entity.Service, error) {
 	var service entity.Service
-	err := s.db.QueryRowContext(ctx, query.GetService, id).Scan(
-		&service.ID,
-		&service.Name,
-		&service.Price,
-		&service.CreatedAt,
-		&service.UpdatedAt,
-	)
-	if err != nil {
-		return entity.Service{}, err
-	}
-
-	return service, nil
-}
-
-func (s *Queries) CreateService(ctx context.Context, payload entity.Service) (entity.Service, error) {
-	payload.IsDeleted = false
-	var service entity.Service
-	err := s.db.QueryRowContext(ctx, query.CreateService, payload.ID, payload.Name, payload.Price, time.Now(), time.Now(), payload.IsDeleted).Scan(
-		&service.ID,
-		&service.Name,
-		&service.Price,
-		&service.CreatedAt,
-		&service.UpdatedAt,
-	)
-
-	if err != nil {
-		return entity.Service{}, err
-	}
-
-	return service, nil
-}
-
-func (s *Queries) UpdateService(ctx context.Context, payload entity.Service) error {
-	_, err := s.db.ExecContext(ctx, query.UpdateService,
-		payload.Name, payload.Price, time.Now(), payload.ID)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Queries) DeleteService(ctx context.Context, id string) error {
-	_, err := s.db.ExecContext(ctx, query.DeleteService, id)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Queries) ListService(ctx context.Context) ([]entity.Service, error) {
-	rows, err := s.db.QueryContext(ctx, query.ListService)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var services []entity.Service
-
-	for rows.Next() {
-		var service entity.Service
-		if err := rows.Scan(
-			&service.ID,
+	err := r.db.QueryRow(query.GetService, id).
+		Scan(
+			&service.Id,
 			&service.Name,
 			&service.Price,
 			&service.CreatedAt,
 			&service.UpdatedAt,
-		); err != nil {
-			return nil, err
+			&service.IsDeleted)
+
+	if err != nil {
+		return service, err
+	}
+
+	return service, nil
+}
+
+func (r *serviceRepository) GetAll(limit, offset int) ([]entity.Service, error) {
+	var services []entity.Service
+
+	rows, err := r.db.Query(query.GetAllServices, limit, offset)
+	if err != nil {
+		return services, err
+	}
+
+	for rows.Next() {
+		var service entity.Service
+		err := rows.Scan(
+			&service.Id,
+			&service.Name,
+			&service.Price,
+			&service.CreatedAt,
+			&service.UpdatedAt,
+			&service.IsDeleted)
+
+		if err != nil {
+			return services, err
 		}
+
 		services = append(services, service)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
+	return services, nil
+}
+
+func (r *serviceRepository) Create(service entity.Service) (entity.Service, error) {
+	service.Id = common.GenerateRoomID("S")
+	err := r.db.QueryRow(query.CreateService,
+		service.Id,
+		service.Name,
+		service.Price,
+		time.Now(),
+	).Scan(
+		&service.Id,
+		&service.Name,
+		&service.Price,
+		&service.CreatedAt,
+		&service.UpdatedAt,
+		&service.IsDeleted)
+
+	if err != nil {
+		return service, err
 	}
 
-	return services, nil
+	return service, nil
+}
+
+func (r *serviceRepository) Update(id string, service entity.Service) (entity.Service, error) {
+	err := r.db.QueryRow(query.UpdateService,
+		id,
+		service.Name,
+		service.Price,
+		time.Now(),
+	).Scan(
+		&service.Id,
+		&service.Name,
+		&service.Price,
+		&service.CreatedAt,
+		&service.UpdatedAt,
+		&service.IsDeleted)
+
+	if err != nil {
+		return service, err
+	}
+
+	return service, nil
+}
+
+func (r *serviceRepository) Delete(id string) error {
+	_, err := r.db.Exec(query.DeleteService, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func NewServiceRepository(db *sql.DB) ServiceRepository {
+	return &serviceRepository{
+		db: db,
+	}
 }
