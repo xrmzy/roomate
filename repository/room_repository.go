@@ -75,6 +75,7 @@ func (r *roomRepository) GetAll(limit, offset int) ([]entity.Room, error) {
 
 func (r *roomRepository) Create(room entity.Room) (entity.Room, error) {
 	err := r.db.QueryRow(query.CreateRoom,
+		room.Id,
 		room.RoomNumber,
 		room.RoomType,
 		room.Capacity,

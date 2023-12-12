@@ -24,14 +24,14 @@ const (
 	GetAllCustomers = `SELECT id, name, email, address, phone_number, created_at, updated_at, is_deleted FROM customers WHERE is_deleted = false ORDER BY id LIMIT $1 OFFSET $2`
 
 	// Room
-	CreateRoom  = `INSERT INTO rooms (room_number, room_type, capacity, facility, price, status, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, room_number, room_type, capacity, facility, price, status, created_at, updated_at, is_deleted`
+	CreateRoom  = `INSERT INTO rooms (id, room_number, room_type, capacity, facility, price, status, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, room_number, room_type, capacity, facility, price, status, created_at, updated_at, is_deleted`
 	UpdateRoom  = `UPDATE rooms SET room_number = $2, room_type = $3, capacity = $4, facility = $5, price = $6, status = $7, updated_at = $8 WHERE id = $1 RETURNING id, room_number, room_type, capacity, facility, price, status, created_at, updated_at, is_deleted`
 	DeleteRoom  = `UPDATE rooms SET is_deleted = true WHERE id = $1`
 	GetRoom     = `SELECT id, room_number, room_type, capacity, facility, price, status, created_at, updated_at, is_deleted FROM rooms WHERE id = $1`
 	GetAllRooms = `SELECT id, room_number, room_type, capacity, facility, price, status, created_at, updated_at, is_deleted FROM rooms WHERE is_deleted = false ORDER BY id LIMIT $1 OFFSET $2`
 
 	// Service
-	CreateService  = `INSERT INTO services (name, price, updated_at) VALUES ($1, $2, $3) RETURNING id, name, price, created_at, updated_at, is_deleted`
+	CreateService  = `INSERT INTO services (id, name, price, updated_at) VALUES ($1, $2, $3, $4) RETURNING id, name, price, created_at, updated_at, is_deleted`
 	UpdateService  = `UPDATE services SET name = $2, price = $3, updated_at = $4 WHERE id = $1 RETURNING id, name, price, created_at, updated_at, is_deleted`
 	DeleteService  = `UPDATE services SET is_deleted = true WHERE id = $1`
 	GetService     = `SELECT id, name, price, created_at, updated_at, is_deleted FROM services WHERE id = $1`

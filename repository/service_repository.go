@@ -67,6 +67,7 @@ func (r *serviceRepository) GetAll(limit, offset int) ([]entity.Service, error) 
 
 func (r *serviceRepository) Create(service entity.Service) (entity.Service, error) {
 	err := r.db.QueryRow(query.CreateService,
+		service.Id,
 		service.Name,
 		service.Price,
 		time.Now(),

@@ -32,7 +32,7 @@ CREATE TABLE "customers" (
 );
 
 CREATE TABLE "rooms" (
-  "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
+  "id" VARCHAR PRIMARY KEY NOT NULL,
   "room_number" INT NOT NULL,
   "room_type" VARCHAR NOT NULL,
   "capacity" INT NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE "rooms" (
 );
 
 CREATE TABLE "services" (
-  "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
+  "id" VARCHAR PRIMARY KEY NOT NULL,
   "name" VARCHAR,
   "price" BIGINT NOT NULL,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
