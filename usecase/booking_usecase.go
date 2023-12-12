@@ -11,6 +11,7 @@ type BookingUsecase interface {
 	GetAllBookings(payload dto.GetAllParams) ([]entity.Booking, error)
 	GetBooking(id string) (entity.Booking, error)
 	CreateBooking(payload dto.CreateBookingParams) (entity.Booking, error)
+	UpdateBookingStatus(payload dto.UpdateBookingStatusParams) (entity.Booking, error)
 	// DeleteBooking(id string) error
 }
 
@@ -41,74 +42,6 @@ func (u *bookingUsecase) GetBooking(id string) (entity.Booking, error) {
 
 	return booking, nil
 }
-
-// func (u *bookingUsecase) CreateBooking(payload dto.CreateBookingParams) (entity.Booking, error) {
-// 	var booking entity.Booking
-// 	var totalPrice int
-
-// 	// parsing string into time
-// 	layout := "2006-01-02"
-// 	checkIn, _ := time.Parse(layout, payload.CheckIn)
-// 	checkOut, _ := time.Parse(layout, payload.CheckOut)
-
-// 	// calculate days
-// 	duration := checkOut.Sub(checkIn)
-// 	days := int(duration.Hours() / 24)
-// 	booking.Night = days
-
-// 	var bookingDetails []entity.BookingDetail
-// 	// looping over booking details
-// 	for _, detail := range payload.BookingDetails {
-// 		var bookingDetail entity.BookingDetail
-
-// 		// get room price
-// 		room, err := u.roomUc.GetRoom(detail.RoomId)
-// 		if err != nil {
-// 			return booking, err
-// 		}
-
-// 		var totalServicesPrice int
-// 		// looping booking detail services to get service price and name
-// 		var services []entity.BookingDetailService
-// 		for _, s := range detail.Services {
-// 			var service entity.BookingDetailService
-
-// 			// get service price
-// 			serviceResult, err := u.serviceUc.GetService(s.ServiceId)
-// 			if err != nil {
-// 				return booking, err
-// 			}
-
-// 			service.ServiceId = s.ServiceId
-// 			service.ServiceName = serviceResult.Name
-// 			services = append(services, service)
-// 			totalServicesPrice += serviceResult.Price
-// 		}
-
-// 		bookingDetail.RoomId = detail.RoomId
-// 		bookingDetail.Services = services
-// 		bookingDetail.SubTotal = totalServicesPrice + room.Price
-
-// 		totalPrice += bookingDetail.SubTotal
-// 		bookingDetails = append(bookingDetails, bookingDetail)
-// 	}
-
-// 	booking.CheckIn = checkIn
-// 	booking.CheckOut = checkOut
-// 	booking.UserId = payload.UserId
-// 	booking.CustomerId = payload.CustomerId
-// 	booking.BookingDetails = bookingDetails
-// 	booking.TotalPrice = totalPrice
-
-// 	booking, err := u.bookingRepo.Create(booking)
-
-// 	if err != nil {
-// 		return booking, err
-// 	}
-
-// 	return booking, nil
-// }
-
 
 func (u *bookingUsecase) CreateBooking(payload dto.CreateBookingParams) (entity.Booking, error) {
 	// Initialize an empty Booking struct and totalPrice variable.
@@ -160,9 +93,9 @@ func (u *bookingUsecase) CreateBooking(payload dto.CreateBookingParams) (entity.
 
 		// Set the room ID, services, and sub-total in the BookingDetail struct.
 		bookingDetails[i] = entity.BookingDetail{
-			RoomId:    detail.RoomId,
-			Services:  services,
-			SubTotal:  totalServicesPrice + room.Price,
+			RoomId:   detail.RoomId,
+			Services: services,
+			SubTotal: totalServicesPrice + room.Price,
 		}
 
 		// Add the sub-total of the current booking detail to the total price.
@@ -184,6 +117,16 @@ func (u *bookingUsecase) CreateBooking(payload dto.CreateBookingParams) (entity.
 	}
 
 	// Return the created booking.
+	return booking, nil
+}
+
+func (u *bookingUsecase) UpdateBookingStatus(payload dto.UpdateBookingStatusParams) (entity.Booking, error) {
+	booking, err := u.bookingRepo.UpdateStatus(payload.BookingId, payload.IsAgree, payload.Information)
+
+	if err != nil {
+		return booking, err
+	}
+
 	return booking, nil
 }
 

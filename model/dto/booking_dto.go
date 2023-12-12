@@ -12,6 +12,12 @@ type CreateBookingParams struct {
 	BookingDetails []entity.BookingDetail `json:"bookingDetails"`
 }
 
+type UpdateBookingStatusParams struct {
+	BookingId   string `json:"bookingId"`
+	IsAgree     bool   `json:"isAgree"`
+	Information string `json:"information"`
+}
+
 // contoh request json
 /*
 	{

@@ -10,12 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ServiceController struct {
+type ServiceController interface {
+	CreateHandler(ctx *gin.Context)
+	GetHandler(ctx *gin.Context)
+	GetAllHandler(ctx *gin.Context)
+	UpdateHandler(ctx *gin.Context)
+	DeleteHandler(ctx *gin.Context)
+	Route()
+}
+
+type serviceController struct {
 	uc usecase.ServiceUseCase
 	rg *gin.RouterGroup
 }
 
-func (s *ServiceController) CreateHandler(ctx *gin.Context) {
+func (s *serviceController) CreateHandler(ctx *gin.Context) {
 	var payload entity.Service
 
 	err := ctx.ShouldBindJSON(&payload)
@@ -33,7 +42,7 @@ func (s *ServiceController) CreateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusCreated, "service created", response)
 }
 
-func (s *ServiceController) GetHandler(ctx *gin.Context) {
+func (s *serviceController) GetHandler(ctx *gin.Context) {
 	serviceId := ctx.Param("id")
 
 	response, err := s.uc.GetService(serviceId)
@@ -45,7 +54,7 @@ func (s *ServiceController) GetHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "service found", response)
 }
 
-func (s *ServiceController) GetAllHandler(ctx *gin.Context) {
+func (s *serviceController) GetAllHandler(ctx *gin.Context) {
 	var payload dto.GetAllParams
 
 	err := ctx.ShouldBindJSON(&payload)
@@ -63,7 +72,7 @@ func (s *ServiceController) GetAllHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "services found", response)
 }
 
-func (s *ServiceController) UpdateHandler(ctx *gin.Context) {
+func (s *serviceController) UpdateHandler(ctx *gin.Context) {
 	serviceId := ctx.Param("id")
 	var payload entity.Service
 
@@ -83,7 +92,7 @@ func (s *ServiceController) UpdateHandler(ctx *gin.Context) {
 }
 
 // delete handler
-func (s *ServiceController) DeleteHandler(ctx *gin.Context) {
+func (s *serviceController) DeleteHandler(ctx *gin.Context) {
 	serviceId := ctx.Param("id")
 
 	err := s.uc.DeleteService(serviceId)
@@ -95,7 +104,7 @@ func (s *ServiceController) DeleteHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "service deleted", nil)
 }
 
-func (s *ServiceController) Route() {
+func (s *serviceController) Route() {
 	s.rg.GET("/services/:id", s.GetHandler)
 	s.rg.GET("/services", s.GetAllHandler)
 	s.rg.POST("/services", s.CreateHandler)
@@ -103,8 +112,8 @@ func (s *ServiceController) Route() {
 	s.rg.DELETE("/services/:id", s.DeleteHandler)
 }
 
-func NewServiceController(uc usecase.ServiceUseCase, rg *gin.RouterGroup) *ServiceController {
-	return &ServiceController{
+func NewServiceController(uc usecase.ServiceUseCase, rg *gin.RouterGroup) *serviceController {
+	return &serviceController{
 		uc: uc,
 		rg: rg,
 	}

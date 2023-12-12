@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -24,7 +25,10 @@ type FileConfig struct {
 	FilePath string
 }
 
-type TokenConfig struct{}
+type TokenConfig struct {
+	JwtSignatureKey []byte
+	JwtLifeTime     time.Duration
+}
 
 type Config struct {
 	ApiConfig
@@ -52,6 +56,16 @@ func (c *Config) readConfig() error {
 	}
 
 	c.FileConfig = FileConfig{FilePath: os.Getenv("LOG_FILE")}
+
+	tokenLifeTime, err := time.ParseDuration(os.Getenv("TOKEN_LIFE_TIME"))
+	if err != nil {
+		return err
+	}
+
+	c.TokenConfig = TokenConfig{
+		JwtSignatureKey: []byte(os.Getenv("JWT_SIGNATURE_KEY")),
+		JwtLifeTime:     tokenLifeTime,
+	}
 
 	if c.ApiConfig.ApiPort == "" || c.DbConfig.Driver == "" || c.DbConfig.Host == "" || c.DbConfig.DbName == "" || c.DbConfig.Port == "" || c.DbConfig.Username == "" || c.DbConfig.Password == "" {
 		return errors.New("all environment variables required")
