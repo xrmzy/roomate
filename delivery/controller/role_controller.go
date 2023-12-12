@@ -10,12 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type RoleController struct {
+type RoleController interface {
+	CreateHandler(ctx *gin.Context)
+	GetHandler(ctx *gin.Context)
+	GetAllHandler(ctx *gin.Context)
+	UpdateHandler(ctx *gin.Context)
+	DeleteHandler(ctx *gin.Context)
+	Route()
+}
+
+type roleController struct {
 	uc usecase.RoleUseCase
 	rg *gin.RouterGroup
 }
 
-func (r *RoleController) CreateHandler(ctx *gin.Context) {
+func (r *roleController) CreateHandler(ctx *gin.Context) {
 	var payload entity.Role
 
 	err := ctx.ShouldBindJSON(&payload)
@@ -33,7 +42,7 @@ func (r *RoleController) CreateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusCreated, "role created", response)
 }
 
-func (r *RoleController) GetHandler(ctx *gin.Context) {
+func (r *roleController) GetHandler(ctx *gin.Context) {
 	roleId := ctx.Param("id")
 
 	response, err := r.uc.GetRole(roleId)
@@ -45,7 +54,7 @@ func (r *RoleController) GetHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "role found", response)
 }
 
-func (r *RoleController) GetAllHandler(ctx *gin.Context) {
+func (r *roleController) GetAllHandler(ctx *gin.Context) {
 	var payload dto.GetAllParams
 
 	err := ctx.ShouldBindJSON(&payload)
@@ -63,7 +72,7 @@ func (r *RoleController) GetAllHandler(ctx *gin.Context) {
 	common.SendPagedResponse(ctx, http.StatusOK, "roles found", response, gin.H{"Start": payload.Offset, "End": payload.Offset + payload.Limit})
 }
 
-func (r *RoleController) UpdateHandler(ctx *gin.Context) {
+func (r *roleController) UpdateHandler(ctx *gin.Context) {
 	roleId := ctx.Param("id")
 	var payload entity.Role
 
@@ -82,7 +91,7 @@ func (r *RoleController) UpdateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "role updated", response)
 }
 
-func (r *RoleController) DeleteHandler(ctx *gin.Context) {
+func (r *roleController) DeleteHandler(ctx *gin.Context) {
 	roleId := ctx.Param("id")
 
 	err := r.uc.DeleteRole(roleId)
@@ -94,7 +103,7 @@ func (r *RoleController) DeleteHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "role deleted", nil)
 }
 
-func (r *RoleController) Route() {
+func (r *roleController) Route() {
 	r.rg.GET("/roles/:id", r.GetHandler)
 	r.rg.GET("/roles", r.GetAllHandler)
 	r.rg.POST("/roles", r.CreateHandler)
@@ -102,8 +111,8 @@ func (r *RoleController) Route() {
 	r.rg.DELETE("/roles/:id", r.DeleteHandler)
 }
 
-func NewRoleController(uc usecase.RoleUseCase, rg *gin.RouterGroup) *RoleController {
-	return &RoleController{
+func NewRoleController(uc usecase.RoleUseCase, rg *gin.RouterGroup) *roleController {
+	return &roleController{
 		uc: uc,
 		rg: rg,
 	}

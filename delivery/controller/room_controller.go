@@ -10,12 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type RoomController struct {
+type RoomController interface {
+	CreateHandler(ctx *gin.Context)
+	GetHandler(ctx *gin.Context)
+	GetAllHandler(ctx *gin.Context)
+	UpdateHandler(ctx *gin.Context)
+	DeleteHandler(ctx *gin.Context)
+	Route()
+}
+
+type roomController struct {
 	uc usecase.RoomUseCase
 	rg *gin.RouterGroup
 }
 
-func (r *RoomController) CreateHandler(ctx *gin.Context) {
+func (r *roomController) CreateHandler(ctx *gin.Context) {
 	var payload entity.Room
 
 	err := ctx.ShouldBindJSON(&payload)
@@ -33,7 +42,7 @@ func (r *RoomController) CreateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusCreated, "room created", response)
 }
 
-func (r *RoomController) GetHandler(ctx *gin.Context) {
+func (r *roomController) GetHandler(ctx *gin.Context) {
 	roomId := ctx.Param("id")
 
 	response, err := r.uc.GetRoom(roomId)
@@ -45,7 +54,7 @@ func (r *RoomController) GetHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "room found", response)
 }
 
-func (r *RoomController) GetAllHandler(ctx *gin.Context) {
+func (r *roomController) GetAllHandler(ctx *gin.Context) {
 	var payload dto.GetAllParams
 
 	err := ctx.ShouldBindJSON(&payload)
@@ -63,7 +72,7 @@ func (r *RoomController) GetAllHandler(ctx *gin.Context) {
 	common.SendPagedResponse(ctx, http.StatusOK, "rooms found", response, gin.H{"Start": payload.Offset, "End": payload.Offset + payload.Limit})
 }
 
-func (r *RoomController) UpdateHandler(ctx *gin.Context) {
+func (r *roomController) UpdateHandler(ctx *gin.Context) {
 	roomId := ctx.Param("id")
 	var payload entity.Room
 
@@ -82,7 +91,7 @@ func (r *RoomController) UpdateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "room updated", response)
 }
 
-func (r *RoomController) DeleteHandler(ctx *gin.Context) {
+func (r *roomController) DeleteHandler(ctx *gin.Context) {
 	roomId := ctx.Param("id")
 
 	err := r.uc.DeleteRoom(roomId)
@@ -94,7 +103,7 @@ func (r *RoomController) DeleteHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "room deleted", nil)
 }
 
-func (r *RoomController) Route() {
+func (r *roomController) Route() {
 	r.rg.GET("/rooms/:id", r.GetHandler)
 	r.rg.GET("/rooms", r.GetAllHandler)
 	r.rg.POST("/rooms", r.CreateHandler)
@@ -102,8 +111,8 @@ func (r *RoomController) Route() {
 	r.rg.DELETE("/rooms/:id", r.DeleteHandler)
 }
 
-func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup) *RoomController {
-	return &RoomController{
+func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup) *roomController {
+	return &roomController{
 		uc: uc,
 		rg: rg,
 	}

@@ -7,6 +7,7 @@ import (
 	"roomate/delivery/controller"
 	"roomate/delivery/middleware"
 	"roomate/manager"
+	"roomate/usecase"
 	"roomate/utils/common"
 
 	"github.com/gin-gonic/gin"
@@ -18,10 +19,13 @@ type Server struct {
 	engine     *gin.Engine
 	host       string
 	logService common.MyLogger
+	auth       usecase.AuthUseCase
+	jwtService common.JwtToken
 }
 
 func (s *Server) setupController() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
+	authMiddleware := middleware.NewAuthMiddleware(s.jwtService)
 	rg := s.engine.Group("/api/v1")
 	// Register all controller in here
 	controller.NewUserController(s.ucManager.UserUsecase(), rg).Route()
@@ -29,7 +33,8 @@ func (s *Server) setupController() {
 	controller.NewCustomerController(s.ucManager.CustomerUseCase(), rg).Route()
 	controller.NewRoomController(s.ucManager.RoomUseCase(), rg).Route()
 	controller.NewServiceController(s.ucManager.ServiceUseCase(), rg).Route()
-	controller.NewBookingController(s.ucManager.BookingUseCase(), rg).Route()
+	controller.NewBookingController(s.ucManager.BookingUseCase(), rg, authMiddleware).Route()
+	controller.NewAuthController(s.auth, rg, s.jwtService).Route()
 }
 
 func (s *Server) Run() {
@@ -50,15 +55,18 @@ func NewServer() *Server {
 		log.Fatal(err)
 	}
 	repoManager := manager.NewRepoManager(infraManager)
-	usecaseManager := manager.NewUseCaseManager(repoManager)
+	useCaseManager := manager.NewUseCaseManager(repoManager)
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	logService := common.NewMyLogger(cfg.FileConfig)
+	jwtService := common.NewJwtToken(cfg.TokenConfig)
 
 	return &Server{
-		ucManager:  usecaseManager,
+		ucManager:  useCaseManager,
 		engine:     engine,
 		host:       host,
 		logService: logService,
+		auth:       usecase.NewAuthUseCase(useCaseManager.UserUsecase(), jwtService),
+		jwtService: jwtService,
 	}
 }

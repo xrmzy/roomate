@@ -10,12 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CustomerController struct {
+type CustomerController interface {
+	CreateHandler(ctx *gin.Context)
+	GetHandler(ctx *gin.Context)
+	GetAllHandler(ctx *gin.Context)
+	UpdateHandler(ctx *gin.Context)
+	DeleteHandler(ctx *gin.Context)
+	Route()
+}
+
+type customerController struct {
 	uc usecase.CustomerUseCase
 	rg *gin.RouterGroup
 }
 
-func (c *CustomerController) CreateHandler(ctx *gin.Context) {
+func (c *customerController) CreateHandler(ctx *gin.Context) {
 	var payload entity.Customer
 
 	err := ctx.ShouldBindJSON(&payload)
@@ -33,7 +42,7 @@ func (c *CustomerController) CreateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusCreated, "customer created", response)
 }
 
-func (c *CustomerController) GetHandler(ctx *gin.Context) {
+func (c *customerController) GetHandler(ctx *gin.Context) {
 	userId := ctx.Param("id")
 
 	response, err := c.uc.GetCustomer(userId)
@@ -45,7 +54,7 @@ func (c *CustomerController) GetHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "customer found", response)
 }
 
-func (c *CustomerController) GetAllHandler(ctx *gin.Context) {
+func (c *customerController) GetAllHandler(ctx *gin.Context) {
 	var payload dto.GetAllParams
 
 	err := ctx.ShouldBindJSON(&payload)
@@ -63,7 +72,7 @@ func (c *CustomerController) GetAllHandler(ctx *gin.Context) {
 	common.SendPagedResponse(ctx, http.StatusOK, "customers found", response, gin.H{"Start": payload.Offset, "End": payload.Offset + payload.Limit})
 }
 
-func (c *CustomerController) UpdateHandler(ctx *gin.Context) {
+func (c *customerController) UpdateHandler(ctx *gin.Context) {
 	userId := ctx.Param("id")
 	var payload entity.Customer
 
@@ -82,7 +91,7 @@ func (c *CustomerController) UpdateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "customer updated", response)
 }
 
-func (c *CustomerController) DeleteHandler(ctx *gin.Context) {
+func (c *customerController) DeleteHandler(ctx *gin.Context) {
 	userId := ctx.Param("id")
 
 	err := c.uc.DeleteCustomer(userId)
@@ -94,7 +103,7 @@ func (c *CustomerController) DeleteHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, http.StatusOK, "customer deleted", nil)
 }
 
-func (c *CustomerController) Route() {
+func (c *customerController) Route() {
 	c.rg.GET("/customers/:id", c.GetHandler)
 	c.rg.GET("/customers", c.GetAllHandler)
 	c.rg.POST("/customers", c.CreateHandler)
@@ -102,8 +111,8 @@ func (c *CustomerController) Route() {
 	c.rg.DELETE("/customers/:id", c.DeleteHandler)
 }
 
-func NewCustomerController(uc usecase.CustomerUseCase, rg *gin.RouterGroup) *CustomerController {
-	return &CustomerController{
+func NewCustomerController(uc usecase.CustomerUseCase, rg *gin.RouterGroup) *customerController {
+	return &customerController{
 		uc: uc,
 		rg: rg,
 	}

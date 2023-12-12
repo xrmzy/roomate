@@ -16,7 +16,7 @@ type useCaseManager struct {
 }
 
 func (u *useCaseManager) UserUsecase() usecase.UserUseCase {
-	return usecase.NewUserUseCase(u.repo.UserRepo())
+	return usecase.NewUserUseCase(u.repo.UserRepo(), u.RoleUsecase())
 }
 
 func (u *useCaseManager) RoleUsecase() usecase.RoleUseCase {

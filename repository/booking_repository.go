@@ -11,8 +11,8 @@ type BookingRepository interface {
 	Get(id string) (entity.Booking, error)
 	GetAll(limit, offset int) ([]entity.Booking, error)
 	Create(booking entity.Booking) (entity.Booking, error)
+	UpdateStatus(id string, isAgree bool, information string) (entity.Booking, error)
 	Delete(id string) error
-	// Update(id string, booking entity.Booking) (entity.Booking, error)
 }
 
 type bookingRepository struct {
@@ -198,6 +198,30 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 	err = tx.Commit()
 	if err != nil {
 		tx.Rollback()
+		return booking, err
+	}
+
+	return booking, nil
+}
+
+func (b *bookingRepository) UpdateStatus(id string, isAgree bool, information string) (entity.Booking, error) {
+	var booking entity.Booking
+	err := b.db.QueryRow(query.UpdateBookingStatus, id, isAgree, information).Scan(
+		&booking.Id,
+		&booking.Night,
+		&booking.CheckIn,
+		&booking.CheckOut,
+		&booking.UserId,
+		&booking.CustomerId,
+		&booking.IsAgree,
+		&booking.Information,
+		&booking.TotalPrice,
+		&booking.CreatedAt,
+		&booking.UpdatedAt,
+		&booking.IsDeleted,
+	)
+
+	if err != nil {
 		return booking, err
 	}
 

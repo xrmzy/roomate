@@ -2,11 +2,12 @@ package common
 
 const (
 	// User
-	CreateUser  = `INSERT INTO users (name, email, password, role_id, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, password, role_id, created_at, updated_at, is_deleted`
-	UpdateUser  = `UPDATE users SET name = $2, email = $3, password = $4, role_id = $5, updated_at = $6 WHERE id = $1 RETURNING id, name, email, password, role_id, created_at, updated_at, is_deleted`
-	DeleteUser  = `UPDATE users SET is_deleted = true WHERE id = $1`
-	GetUser     = `SELECT id, name, email, role_id, role_name, created_at, updated_at, is_deleted FROM users WHERE id = $1`
-	GetAllUsers = `SELECT id, name, email, role_id, role_name, created_at, updated_at, is_deleted FROM users WHERE is_deleted = false ORDER BY id LIMIT $1 OFFSET $2`
+	CreateUser = `INSERT INTO users (name, email, password, role_id, role_name, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, role_id, role_name, created_at, updated_at, is_deleted`
+	// update user without updating password
+	UpdateUser     = `UPDATE users SET name = $2, email = $3, role_id = $4, role_name = $5, updated_at = $6 WHERE id = $1 RETURNING id, name, email, role_id, role_name, created_at, updated_at, is_deleted`
+	DeleteUser     = `UPDATE users SET is_deleted = true WHERE id = $1`
+	GetUser        = `SELECT id, name, email, role_id, role_name, created_at, updated_at, is_deleted FROM users WHERE id = $1`
+	GetAllUsers    = `SELECT id, name, email, role_id, role_name, created_at, updated_at, is_deleted FROM users WHERE is_deleted = false ORDER BY id LIMIT $1 OFFSET $2`
 
 	// Role
 	CreateRole  = `INSERT INTO roles (role_name, updated_at) VALUES ($1, $2) RETURNING id, role_name, created_at, updated_at, is_deleted`
@@ -57,6 +58,8 @@ const (
 
 // custom queries
 const (
-	GetRoleName    = `SELECT role_name FROM roles WHERE id = $1`
-	UpdateRoleName = `UPDATE users SET role_name = $2 WHERE id = $1`
+	GetRoleName = `SELECT role_name FROM roles WHERE id = $1`
+	GetByEmail = `SELECT id, role_name, password FROM users WHERE email = $1`
+	UpdatePassword = `UPDATE users SET password = $2 WHERE id = $1 RETURNING id, name, email, role_id, role_name, created_at, updated_at, is_deleted`
+	UpdateBookingStatus = `UPDATE bookings SET is_agree = $2, information = $3 WHERE id = $1 RETURNING id, night, check_in, check_out, user_id, customer_id, is_agree, information, total_price, created_at, updated_at, is_deleted`
 )
