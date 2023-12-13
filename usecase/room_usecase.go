@@ -38,8 +38,7 @@ func (u *roomUseCase) GetRoom(id string) (entity.Room, error) {
 }
 
 func (u *roomUseCase) CreateRoom(room entity.Room) (entity.Room, error) {
-	roomId := common.GenerateRandomId("R")
-	room.Id = roomId
+	room.Id = common.GenerateRandomId("R")
 
 	room, err := u.roomRepo.Create(room)
 	if err != nil {

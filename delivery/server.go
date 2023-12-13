@@ -15,12 +15,15 @@ import (
 )
 
 type Server struct {
-	ucManager  manager.UseCaseManager
-	engine     *gin.Engine
-	host       string
-	logService common.MyLogger
-	auth       usecase.AuthUseCase
-	jwtService common.JwtToken
+	ucManager     manager.UseCaseManager
+	engine        *gin.Engine
+	host          string
+	logService    common.MyLogger
+	auth          usecase.AuthUseCase
+	jwtService    common.JwtToken
+	gSheetUc      usecase.GSheetUseCase
+	gSheetService common.GSheet
+	gDriveService common.GDrive
 }
 
 func (s *Server) setupController() {
@@ -35,6 +38,7 @@ func (s *Server) setupController() {
 	controller.NewServiceController(s.ucManager.ServiceUseCase(), rg).Route()
 	controller.NewBookingController(s.ucManager.BookingUseCase(), rg, authMiddleware).Route()
 	controller.NewAuthController(s.auth, rg, s.jwtService).Route()
+	controller.NewGSheetController(s.gSheetUc, rg, authMiddleware).Route()
 }
 
 func (s *Server) Run() {
@@ -60,13 +64,18 @@ func NewServer() *Server {
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	logService := common.NewMyLogger(cfg.FileConfig)
 	jwtService := common.NewJwtToken(cfg.TokenConfig)
+	gSheetService := common.NewGSheet(cfg.SheetConfig)
+	gDriveService := common.NewGDrive(cfg.SheetConfig)
 
 	return &Server{
-		ucManager:  useCaseManager,
-		engine:     engine,
-		host:       host,
-		logService: logService,
-		auth:       usecase.NewAuthUseCase(useCaseManager.UserUsecase(), jwtService),
-		jwtService: jwtService,
+		ucManager:     useCaseManager,
+		engine:        engine,
+		host:          host,
+		logService:    logService,
+		auth:          usecase.NewAuthUseCase(useCaseManager.UserUsecase(), jwtService),
+		jwtService:    jwtService,
+		gSheetUc:      usecase.NewGSheetUseCase(repoManager.BookingRepo(), useCaseManager.UserUsecase(), useCaseManager.CustomerUseCase(), gDriveService, gSheetService),
+		gSheetService: gSheetService,
+		gDriveService: gDriveService,
 	}
 }

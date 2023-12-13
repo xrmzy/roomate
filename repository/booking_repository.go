@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"roomate/model/dto"
 	"roomate/model/entity"
 	query "roomate/utils/common"
 	"time"
@@ -13,6 +14,9 @@ type BookingRepository interface {
 	Create(booking entity.Booking) (entity.Booking, error)
 	UpdateStatus(id string, isAgree bool, information string) (entity.Booking, error)
 	Delete(id string) error
+	GetOneDay(date string) (dto.SheetData, error)
+	GetOneMonth(month, year string) ([]dto.SheetData, error)
+	GetOneYear(year string) ([]dto.SheetData, error)
 }
 
 type bookingRepository struct {
@@ -235,6 +239,86 @@ func (b *bookingRepository) Delete(id string) error {
 	}
 
 	return nil
+}
+
+func (b *bookingRepository) GetOneDay(date string) (dto.SheetData, error) {
+	var booking dto.SheetData
+	err := b.db.QueryRow(query.GetBookingOneDay, date).Scan(
+		&booking.BookingId,
+		&booking.CheckIn,
+		&booking.CheckOut,
+		&booking.UserName,     // disini masih user id
+		&booking.CustomerName, // dinisi juga masih customer id
+		&booking.IsAgree,
+		&booking.Information,
+		&booking.TotalPrice,
+	)
+
+	if err != nil {
+		return booking, err
+	}
+
+	return booking, nil
+}
+
+func (b *bookingRepository) GetOneMonth(month, year string) ([]dto.SheetData, error) {
+	var bookings []dto.SheetData
+	rows, err := b.db.Query(query.GetBookingOneMonth, month, year)
+	if err != nil {
+		return bookings, err
+	}
+
+	for rows.Next() {
+		var booking dto.SheetData
+		err = rows.Scan(
+			&booking.BookingId,
+			&booking.CheckIn,
+			&booking.CheckOut,
+			&booking.UserName,     // disini masih user id
+			&booking.CustomerName, // dinisi juga masih customer id
+			&booking.IsAgree,
+			&booking.Information,
+			&booking.TotalPrice,
+		)
+
+		if err != nil {
+			return bookings, err
+		}
+
+		bookings = append(bookings, booking)
+	}
+
+	return bookings, nil
+}
+
+func (b *bookingRepository) GetOneYear(year string) ([]dto.SheetData, error) {
+	var bookings []dto.SheetData
+	rows, err := b.db.Query(query.GetBookingOneYear, year)
+	if err != nil {
+		return bookings, err
+	}
+
+	for rows.Next() {
+		var booking dto.SheetData
+		err = rows.Scan(
+			&booking.BookingId,
+			&booking.CheckIn,
+			&booking.CheckOut,
+			&booking.UserName,     // disini masih user id
+			&booking.CustomerName, // dinisi juga masih customer id
+			&booking.IsAgree,
+			&booking.Information,
+			&booking.TotalPrice,
+		)
+
+		if err != nil {
+			return bookings, err
+		}
+
+		bookings = append(bookings, booking)
+	}
+
+	return bookings, nil
 }
 
 func NewBookingRepository(db *sql.DB) BookingRepository {
