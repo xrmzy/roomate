@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"roomate/model/entity"
-	"roomate/utils/common"
 	query "roomate/utils/common"
 	"time"
 )
@@ -75,7 +74,7 @@ func (r *roomRepository) GetAll(limit, offset int) ([]entity.Room, error) {
 }
 
 func (r *roomRepository) Create(room entity.Room) (entity.Room, error) {
-	room.Id = common.GenerateRoomID("R") // Membuat ID dengan prefiks "R"
+	room.Id = query.GenerateRoomID("R") // Membuat ID dengan prefiks "R"
 
 	err := r.db.QueryRow(query.CreateRoom,
 		room.Id,
