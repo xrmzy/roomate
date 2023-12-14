@@ -28,5 +28,3 @@ services:
 
 volumes:
   data-volume:
-    external: true
-    name: data-volume
