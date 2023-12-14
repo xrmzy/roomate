@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"io"
 	"net/http"
-	"os"
 	"roomate/delivery/middleware"
 	"roomate/model/dto"
 	"roomate/usecase"
@@ -32,7 +32,8 @@ func (s *sheetController) dayHandler(ctx *gin.Context) {
 		return
 	}
 
-	if err := s.sheetUc.DailyReport(payload); err != nil {
+	resp, err := s.sheetUc.DailyReport(payload)
+	if err != nil {
 		common.SendSingleResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -46,9 +47,10 @@ func (s *sheetController) dayHandler(ctx *gin.Context) {
 	formattedDate := parsedTime.Format("2006-01-02")
 	newFileName := "DailyReport-" + formattedDate + ".xlsx"
 
-	ctx.FileAttachment("output.xlsx", newFileName)
+	ctx.Header("Content-Disposition", "attachment; filename="+newFileName)
 
-	err = os.Remove("output.xlsx")
+	// Copy the file from the API response to the client's response
+	_, err = io.Copy(ctx.Writer, resp.Body)
 	if err != nil {
 		common.SendSingleResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -62,7 +64,7 @@ func (s *sheetController) monthHandler(ctx *gin.Context) {
 		return
 	}
 
-	err := s.sheetUc.MonthlyReport(payload)
+	resp, err := s.sheetUc.MonthlyReport(payload)
 	if err != nil {
 		common.SendSingleResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -70,9 +72,10 @@ func (s *sheetController) monthHandler(ctx *gin.Context) {
 
 	newFileName := "MonthlyReport-" + payload.Month + "-" + payload.Year + ".xlsx"
 
-	ctx.FileAttachment("output.xlsx", newFileName)
+	ctx.Header("Content-Disposition", "attachment; filename="+newFileName)
 
-	err = os.Remove("output.xlsx")
+	// Copy the file from the API response to the client's response
+	_, err = io.Copy(ctx.Writer, resp.Body)
 	if err != nil {
 		common.SendSingleResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -86,7 +89,7 @@ func (s *sheetController) yearHandler(ctx *gin.Context) {
 		return
 	}
 
-	err := s.sheetUc.YearlyReport(payload)
+	resp, err := s.sheetUc.YearlyReport(payload)
 	if err != nil {
 		common.SendSingleResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -94,9 +97,10 @@ func (s *sheetController) yearHandler(ctx *gin.Context) {
 
 	newFileName := "YearlyReport-" + payload.Year + ".xlsx"
 
-	ctx.FileAttachment("output.xlsx", newFileName)
+	ctx.Header("Content-Disposition", "attachment; filename="+newFileName)
 
-	err = os.Remove("output.xlsx")
+	// Copy the file from the API response to the client's response
+	_, err = io.Copy(ctx.Writer, resp.Body)
 	if err != nil {
 		common.SendSingleResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

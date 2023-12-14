@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"net/http"
 	"roomate/model/dto"
 	"roomate/repository"
 	"roomate/utils/common"
@@ -8,9 +9,9 @@ import (
 )
 
 type GSheetUseCase interface {
-	DailyReport(payload dto.GetBookingOneDayParams) error
-	MonthlyReport(payload dto.GetBookingOneMonthParams) error
-	YearlyReport(payload dto.GetBookingOneYearParams) error
+	DailyReport(payload dto.GetBookingOneDayParams) (*http.Response, error)
+	MonthlyReport(payload dto.GetBookingOneMonthParams) (*http.Response, error)
+	YearlyReport(payload dto.GetBookingOneYearParams) (*http.Response, error)
 }
 
 type gSheetUseCase struct {
@@ -21,24 +22,25 @@ type gSheetUseCase struct {
 	gSheet      common.GSheet
 }
 
-func (s *gSheetUseCase) DailyReport(payload dto.GetBookingOneDayParams) error {
+func (s *gSheetUseCase) DailyReport(payload dto.GetBookingOneDayParams) (*http.Response, error) {
+	var resp *http.Response
 	// get booking data
 	booking, err := s.bookingRepo.GetOneDay(payload.Date)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// get user name
 	user, err := s.userUc.GetUser(booking.UserName) // booking.UserName masih user id
 	if err != nil {
-		return err
+		return resp, err
 	}
 	booking.UserName = user.Name
 
 	// get customer name
 	customer, err := s.customerUc.GetCustomer(booking.CustomerName) // booking.CustomerName masih id
 	if err != nil {
-		return err
+		return resp, err
 	}
 	booking.CustomerName = customer.Name
 
@@ -54,40 +56,41 @@ func (s *gSheetUseCase) DailyReport(payload dto.GetBookingOneDayParams) error {
 	// get new sheet service
 	service, err := s.gSheet.NewService()
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// clear sheet data if exist
 	err = s.gSheet.DeleteSheetData(service)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// append data to sheet
 	err = s.gSheet.AppendSheet(bookingSlice, service)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// get new drive service
 	driveService, err := s.gDrive.NewService()
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// download sheet file
-	err = s.gDrive.Download(driveService)
+	resp, err = s.gDrive.Download(driveService)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
-	return nil
+	return resp, nil
 }
 
-func (s *gSheetUseCase) MonthlyReport(payload dto.GetBookingOneMonthParams) error {
+func (s *gSheetUseCase) MonthlyReport(payload dto.GetBookingOneMonthParams) (*http.Response, error) {
+	var resp *http.Response
 	bookings, err := s.bookingRepo.GetOneMonth(payload.Month, payload.Year)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	var newBookings []dto.SheetData
@@ -95,14 +98,14 @@ func (s *gSheetUseCase) MonthlyReport(payload dto.GetBookingOneMonthParams) erro
 		// get user name
 		user, err := s.userUc.GetUser(booking.UserName)
 		if err != nil {
-			return err
+			return resp, err
 		}
 		booking.UserName = user.Name
 
 		// get customer name
 		customer, err := s.customerUc.GetCustomer(booking.CustomerName)
 		if err != nil {
-			return err
+			return resp, err
 		}
 		booking.CustomerName = customer.Name
 
@@ -118,40 +121,41 @@ func (s *gSheetUseCase) MonthlyReport(payload dto.GetBookingOneMonthParams) erro
 	// get new sheet service
 	service, err := s.gSheet.NewService()
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// clear sheet data if exist
 	err = s.gSheet.DeleteSheetData(service)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// append data to sheet
 	err = s.gSheet.AppendSheet(newBookings, service)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// get new drive service
 	driveService, err := s.gDrive.NewService()
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// download sheet file
-	err = s.gDrive.Download(driveService)
+	resp, err = s.gDrive.Download(driveService)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
-	return nil
+	return resp, nil
 }
 
-func (s *gSheetUseCase) YearlyReport(payload dto.GetBookingOneYearParams) error {
+func (s *gSheetUseCase) YearlyReport(payload dto.GetBookingOneYearParams) (*http.Response, error) {
+	var resp *http.Response
 	bookings, err := s.bookingRepo.GetOneYear(payload.Year)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	var newBookings []dto.SheetData
@@ -159,14 +163,14 @@ func (s *gSheetUseCase) YearlyReport(payload dto.GetBookingOneYearParams) error 
 		// get user name
 		user, err := s.userUc.GetUser(booking.UserName)
 		if err != nil {
-			return err
+			return resp, err
 		}
 		booking.UserName = user.Name
 
 		// get customer name
 		customer, err := s.customerUc.GetCustomer(booking.CustomerName)
 		if err != nil {
-			return err
+			return resp, err
 		}
 		booking.CustomerName = customer.Name
 
@@ -182,34 +186,34 @@ func (s *gSheetUseCase) YearlyReport(payload dto.GetBookingOneYearParams) error 
 	// get new sheet service
 	service, err := s.gSheet.NewService()
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// clear sheet data if exist
 	err = s.gSheet.DeleteSheetData(service)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// append data to sheet
 	err = s.gSheet.AppendSheet(newBookings, service)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// get new drive service
 	driveService, err := s.gDrive.NewService()
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	// download sheet file
-	err = s.gDrive.Download(driveService)
+	resp, err = s.gDrive.Download(driveService)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
-	return nil
+	return resp, nil
 }
 
 func NewGSheetUseCase(
