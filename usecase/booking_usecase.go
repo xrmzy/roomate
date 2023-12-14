@@ -53,10 +53,7 @@ func (u *bookingUsecase) CreateBooking(payload dto.CreateBookingParams) (entity.
 	checkOut, _ := time.Parse("2006-01-02", payload.CheckOut)
 
 	// Calculate the number of nights by subtracting the check-in date from the check-out date.
-	days := int(checkOut.Sub(checkIn).Hours() / 24)
-
-	// Set the 'Night' field in the booking struct to the number of nights.
-	booking.Night = days
+	booking.Night = int(checkOut.Sub(checkIn).Hours() / 24)
 
 	// Create an array of BookingDetail structs with the same length as the number of booking details in the payload.
 	bookingDetails := make([]entity.BookingDetail, len(payload.BookingDetails))
@@ -95,7 +92,7 @@ func (u *bookingUsecase) CreateBooking(payload dto.CreateBookingParams) (entity.
 		bookingDetails[i] = entity.BookingDetail{
 			RoomId:   detail.RoomId,
 			Services: services,
-			SubTotal: totalServicesPrice + room.Price,
+			SubTotal: totalServicesPrice + room.Price*booking.Night,
 		}
 
 		// Add the sub-total of the current booking detail to the total price.

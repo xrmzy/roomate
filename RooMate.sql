@@ -32,7 +32,7 @@ CREATE TABLE "customers" (
 );
 
 CREATE TABLE "rooms" (
-  "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
+  "id" VARCHAR PRIMARY KEY NOT NULL,
   "room_number" INT NOT NULL,
   "room_type" VARCHAR NOT NULL,
   "capacity" INT NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE "rooms" (
 );
 
 CREATE TABLE "services" (
-  "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
+  "id" VARCHAR PRIMARY KEY NOT NULL,
   "name" VARCHAR,
   "price" BIGINT NOT NULL,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
@@ -71,7 +71,7 @@ CREATE TABLE "bookings" (
 CREATE TABLE "booking_details" (
   "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
   "booking_id" UUID NOT NULL,
-  "room_id" UUID NOT NULL,
+  "room_id" VARCHAR NOT NULL,
   "sub_total" BIGINT,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" TIMESTAMP NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE "booking_details" (
 CREATE TABLE "booking_detail_services" (
   "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
   "booking_detail_id" UUID NOT NULL,
-  "service_id" UUID NOT NULL,
+  "service_id" VARCHAR NOT NULL,
   "service_name" VARCHAR,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" TIMESTAMP NOT NULL,

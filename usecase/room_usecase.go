@@ -4,6 +4,7 @@ import (
 	"roomate/model/dto"
 	"roomate/model/entity"
 	"roomate/repository"
+	"roomate/utils/common"
 )
 
 type RoomUseCase interface {
@@ -37,6 +38,8 @@ func (u *roomUseCase) GetRoom(id string) (entity.Room, error) {
 }
 
 func (u *roomUseCase) CreateRoom(room entity.Room) (entity.Room, error) {
+	room.Id = common.GenerateRandomId("R")
+
 	room, err := u.roomRepo.Create(room)
 	if err != nil {
 		return room, err

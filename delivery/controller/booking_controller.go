@@ -93,7 +93,7 @@ func (b *bookingController) Route() {
 	allUser := b.rg.Group("/bookings", b.authMiddleware.RequireToken("admin, ga, employee"))
 	allUser.GET("/:id", b.GetHandler)
 	allUser.GET("/", b.GetAllHandler)
-	allUser.POST("/", b.CreateHandler)
+	b.rg.POST("/bookings", b.authMiddleware.RequireToken("employee"), b.CreateHandler)
 	b.rg.PUT("/bookings/status/", b.authMiddleware.RequireToken("ga"), b.UpdateBookingStatusHandler)
 }
 
