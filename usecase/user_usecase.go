@@ -70,6 +70,8 @@ func (u *userUseCase) CreateUser(user entity.User) (entity.User, error) {
 		return user, err
 	}
 
+	//lowercase email
+
 	user.Password = hashedPassword
 
 	user, err = u.userRepo.Create(user)
