@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS booking_detail_services;
+DROP TABLE IF EXISTS booking_details;
+DROP TABLE IF EXISTS bookings;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS rooms;
+DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS roles;
