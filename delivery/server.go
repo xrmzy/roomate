@@ -15,15 +15,16 @@ import (
 )
 
 type Server struct {
-	ucManager     manager.UseCaseManager
-	engine        *gin.Engine
-	host          string
-	logService    common.MyLogger
-	auth          usecase.AuthUseCase
-	jwtService    common.JwtToken
-	gSheetUc      usecase.GSheetUseCase
-	gSheetService common.GSheet
-	gDriveService common.GDrive
+	ucManager      manager.UseCaseManager
+	engine         *gin.Engine
+	host           string
+	logService     common.MyLogger
+	auth           usecase.AuthUseCase
+	jwtService     common.JwtToken
+	gSheetUc       usecase.GSheetUseCase
+	gSheetService  common.GSheet
+	gDriveService  common.GDrive
+	migrateService common.DbMigration
 }
 
 func (s *Server) setupController() {
@@ -46,6 +47,8 @@ func (s *Server) Run() {
 	if err := s.engine.Run(s.host); err != nil {
 		panic(err)
 	}
+
+	s.migrateService.RunDBMigration()
 }
 
 func NewServer() *Server {
@@ -66,6 +69,7 @@ func NewServer() *Server {
 	jwtService := common.NewJwtToken(cfg.TokenConfig)
 	gSheetService := common.NewGSheet(cfg.SheetConfig)
 	gDriveService := common.NewGDrive(cfg.SheetConfig)
+	migrateService := common.NewDbMigration(cfg.MigrateConfig)
 
 	return &Server{
 		ucManager:     useCaseManager,
@@ -77,5 +81,6 @@ func NewServer() *Server {
 		gSheetUc:      usecase.NewGSheetUseCase(repoManager.BookingRepo(), useCaseManager.UserUsecase(), useCaseManager.CustomerUseCase(), gDriveService, gSheetService),
 		gSheetService: gSheetService,
 		gDriveService: gDriveService,
+		migrateService: migrateService,
 	}
 }
