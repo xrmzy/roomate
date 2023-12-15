@@ -35,18 +35,12 @@ type SheetConfig struct {
 	SpreadsheetId     string
 }
 
-type MigrateConfig struct {
-	MigrationUrl string
-	DbSource     string
-}
-
 type Config struct {
 	ApiConfig
 	DbConfig
 	FileConfig
 	TokenConfig
 	SheetConfig
-	MigrateConfig
 }
 
 func (c *Config) readConfig() error {
@@ -84,10 +78,6 @@ func (c *Config) readConfig() error {
 		SpreadsheetId:     os.Getenv("SPREADSHEET_ID"),
 	}
 
-	c.MigrateConfig = MigrateConfig{
-		MigrationUrl: os.Getenv("MIGRATION_URL"),
-		DbSource:     os.Getenv("DB_SOURCE"),
-	}
 
 	if c.ApiConfig.ApiPort == "" || c.DbConfig.Driver == "" || c.DbConfig.Host == "" || c.DbConfig.DbName == "" || c.DbConfig.Port == "" || c.DbConfig.Username == "" || c.DbConfig.Password == "" {
 		return errors.New("all environment variables required")
