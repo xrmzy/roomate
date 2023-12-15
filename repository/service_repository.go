@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"roomate/model/entity"
-	"roomate/utils/common"
 	query "roomate/utils/common"
 	"time"
 )
@@ -67,7 +66,7 @@ func (r *serviceRepository) GetAll(limit, offset int) ([]entity.Service, error) 
 }
 
 func (r *serviceRepository) Create(service entity.Service) (entity.Service, error) {
-	service.Id = common.GenerateRoomID("S")
+	service.Id = query.GenerateRoomID("S")
 	err := r.db.QueryRow(query.CreateService,
 		service.Id,
 		service.Name,
