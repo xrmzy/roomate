@@ -119,9 +119,23 @@ func (u *bookingUsecase) CreateBooking(payload dto.CreateBookingParams) (entity.
 
 func (u *bookingUsecase) UpdateBookingStatus(payload dto.UpdateBookingStatusParams) (entity.Booking, error) {
 	booking, err := u.bookingRepo.UpdateStatus(payload.BookingId, payload.IsAgree, payload.Information)
-
 	if err != nil {
 		return booking, err
+	}
+
+	if payload.IsAgree {
+		newBooking, err := u.bookingRepo.Get(payload.BookingId)
+		if err != nil {
+			return booking, err
+		}
+
+		// update room status to booked
+		for _, bookingDetail := range newBooking.BookingDetails {
+			err := u.roomUc.UpdateStatus(bookingDetail.RoomId)
+			if err != nil {
+				return booking, err
+			}
+		}
 	}
 
 	return booking, nil

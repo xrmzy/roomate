@@ -12,6 +12,7 @@ type RoomRepository interface {
 	GetAll(limit, offset int) ([]entity.Room, error)
 	Create(room entity.Room) (entity.Room, error)
 	Update(id string, room entity.Room) (entity.Room, error)
+	UpdateStatus(id string) error
 	Delete(id string) error
 }
 
@@ -129,6 +130,15 @@ func (r *roomRepository) Update(id string, room entity.Room) (entity.Room, error
 	}
 
 	return room, nil
+}
+
+func (r *roomRepository) UpdateStatus(id string) error {
+	_, err := r.db.Exec(query.UpdateRoomStatus, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *roomRepository) Delete(id string) error {
