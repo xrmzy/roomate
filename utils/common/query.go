@@ -53,7 +53,7 @@ const (
 	// Booking Detail Service
 	CreateBookingDetailService  = `INSERT INTO booking_detail_services (booking_detail_id, service_id, service_name, updated_at) VALUES ($1, $2, $3, $4) RETURNING id, booking_detail_id, service_id, service_name, created_at, updated_at, is_deleted`
 	DeleteBookingDetailService  = `UPDATE booking_detail_services SET is_deleted = true WHERE id = $1`
-	GetAllBookingDetailServices = `SELECT id, booking_detail_id, service_id, created_at, updated_at, is_deleted FROM booking_detail_services WHERE booking_detail_id = $1`
+	GetAllBookingDetailServices = `SELECT id, booking_detail_id, service_id, service_name, created_at, updated_at, is_deleted FROM booking_detail_services WHERE booking_detail_id = $1`
 )
 
 // custom queries

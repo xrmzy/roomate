@@ -25,7 +25,6 @@ type bookingUsecase struct {
 
 func (u *bookingUsecase) GetAllBookings(payload dto.GetAllParams) ([]entity.Booking, error) {
 	bookings, err := u.bookingRepo.GetAll(payload.Limit, payload.Offset)
-
 	if err != nil {
 		return bookings, err
 	}
@@ -35,7 +34,6 @@ func (u *bookingUsecase) GetAllBookings(payload dto.GetAllParams) ([]entity.Book
 
 func (u *bookingUsecase) GetBooking(id string) (entity.Booking, error) {
 	booking, err := u.bookingRepo.Get(id)
-
 	if err != nil {
 		return booking, err
 	}
