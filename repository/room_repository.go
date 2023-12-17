@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"roomate/model/entity"
-	"roomate/utils/common"
 	query "roomate/utils/common"
 	"time"
 )
@@ -13,6 +12,7 @@ type RoomRepository interface {
 	GetAll(limit, offset int) ([]entity.Room, error)
 	Create(room entity.Room) (entity.Room, error)
 	Update(id string, room entity.Room) (entity.Room, error)
+	UpdateStatus(id string) error
 	Delete(id string) error
 }
 
@@ -75,8 +75,6 @@ func (r *roomRepository) GetAll(limit, offset int) ([]entity.Room, error) {
 }
 
 func (r *roomRepository) Create(room entity.Room) (entity.Room, error) {
-	room.Id = common.GenerateRoomID("R") // Membuat ID dengan prefiks "R"
-
 	err := r.db.QueryRow(query.CreateRoom,
 		room.Id,
 		room.RoomNumber,
@@ -132,6 +130,15 @@ func (r *roomRepository) Update(id string, room entity.Room) (entity.Room, error
 	}
 
 	return room, nil
+}
+
+func (r *roomRepository) UpdateStatus(id string) error {
+	_, err := r.db.Exec(query.UpdateRoomStatus, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *roomRepository) Delete(id string) error {

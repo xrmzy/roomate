@@ -4,6 +4,7 @@ import (
 	"roomate/model/dto"
 	"roomate/model/entity"
 	"roomate/repository"
+	"roomate/utils/common"
 )
 
 type RoomUseCase interface {
@@ -11,6 +12,7 @@ type RoomUseCase interface {
 	GetRoom(id string) (entity.Room, error)
 	CreateRoom(room entity.Room) (entity.Room, error)
 	UpdateRoom(id string, room entity.Room) (entity.Room, error)
+	UpdateStatus(id string) error
 	DeleteRoom(id string) error
 }
 
@@ -36,7 +38,11 @@ func (u *roomUseCase) GetRoom(id string) (entity.Room, error) {
 	return room, nil
 }
 
+var roomId = common.GenerateRandomId("R")
+
 func (u *roomUseCase) CreateRoom(room entity.Room) (entity.Room, error) {
+	room.Id = roomId
+
 	room, err := u.roomRepo.Create(room)
 	if err != nil {
 		return room, err
@@ -52,6 +58,15 @@ func (u *roomUseCase) UpdateRoom(id string, room entity.Room) (entity.Room, erro
 	}
 
 	return room, nil
+}
+
+func (u *roomUseCase) UpdateStatus(id string) error {
+	err := u.roomRepo.UpdateStatus(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (u *roomUseCase) DeleteRoom(id string) error {

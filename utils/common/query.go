@@ -53,7 +53,7 @@ const (
 	// Booking Detail Service
 	CreateBookingDetailService  = `INSERT INTO booking_detail_services (booking_detail_id, service_id, service_name, updated_at) VALUES ($1, $2, $3, $4) RETURNING id, booking_detail_id, service_id, service_name, created_at, updated_at, is_deleted`
 	DeleteBookingDetailService  = `UPDATE booking_detail_services SET is_deleted = true WHERE id = $1`
-	GetAllBookingDetailServices = `SELECT id, booking_detail_id, service_id, created_at, updated_at, is_deleted FROM booking_detail_services WHERE booking_detail_id = $1`
+	GetAllBookingDetailServices = `SELECT id, booking_detail_id, service_id, service_name, created_at, updated_at, is_deleted FROM booking_detail_services WHERE booking_detail_id = $1`
 )
 
 // custom queries
@@ -62,4 +62,8 @@ const (
 	GetByEmail          = `SELECT id, role_name, password FROM users WHERE email = $1`
 	UpdatePassword      = `UPDATE users SET password = $2 WHERE id = $1 RETURNING id, name, email, role_id, role_name, created_at, updated_at, is_deleted`
 	UpdateBookingStatus = `UPDATE bookings SET is_agree = $2, information = $3 WHERE id = $1 RETURNING id, night, check_in, check_out, user_id, customer_id, is_agree, information, total_price, created_at, updated_at, is_deleted`
+	UpdateRoomStatus    = `UPDATE rooms SET status = 'booked' WHERE id = $1`
+	GetBookingOneDay    = `SELECT id, check_in, check_out, user_id, customer_id, is_agree, information, total_price FROM bookings WHERE check_in = $1`
+	GetBookingOneMonth  = `SELECT id, check_in, check_out, user_id, customer_id, is_agree, information, total_price FROM bookings WHERE EXTRACT(MONTH FROM "check_in") = $1 AND EXTRACT(YEAR FROM "check_in") = $2`
+	GetBookingOneYear   = `SELECT id, check_in, check_out, user_id, customer_id, is_agree, information, total_price FROM bookings WHERE EXTRACT(YEAR FROM "check_in") = $1`
 )
