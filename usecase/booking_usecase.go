@@ -17,8 +17,6 @@ type BookingUsecase interface {
 
 type bookingUsecase struct {
 	bookingRepo repository.BookingRepository
-	userUc      UserUseCase
-	customerUc  CustomerUseCase
 	roomUc      RoomUseCase
 	serviceUc   ServiceUseCase
 }
@@ -141,15 +139,11 @@ func (u *bookingUsecase) UpdateBookingStatus(payload dto.UpdateBookingStatusPara
 
 func NewBookingUseCase(
 	bookingRepo repository.BookingRepository,
-	userUc UserUseCase,
-	customerUc CustomerUseCase,
 	roomUc RoomUseCase,
 	serviceUc ServiceUseCase,
 ) BookingUsecase {
 	return &bookingUsecase{
 		bookingRepo: bookingRepo,
-		userUc:      userUc,
-		customerUc:  customerUc,
 		roomUc:      roomUc,
 		serviceUc:   serviceUc,
 	}
