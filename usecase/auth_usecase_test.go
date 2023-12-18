@@ -35,7 +35,7 @@ func (suite *AuthUseCaseTestSuite) TestLogin_Success() {
 	suite.jum.On("GenerateToken", mockUser).Return(mockToken, nil)
 
 	// Membuat instance dari AuthUseCase menggunakan mock yang sudah disiapkan
-	authUC := usecase.NewAuthUseCase(suite.uum, suite.jum)
+	authUC := NewAuthUseCase(suite.uum, suite.jum)
 
 	// Payload yang akan digunakan untuk Login
 	payload := dto.AuthRequestDto{Email: "test@example.com", Password: "password"}
@@ -85,7 +85,7 @@ func (suite *AuthUseCaseTestSuite) TestLogin_GenerateTokenError() {
 	suite.jum.On("GenerateToken", mockUser).Return(dto.AuthResponseDto{}, mockError)
 
 	// Membuat instance dari AuthUseCase menggunakan mock yang sudah disiapkan
-	authUC := usecase.NewAuthUseCase(suite.uum, suite.jum)
+	authUC := NewAuthUseCase(suite.uum, suite.jum)
 
 	// Payload yang akan digunakan untuk Login
 	payload := dto.AuthRequestDto{Email: "test@example.com", Password: "password"}
