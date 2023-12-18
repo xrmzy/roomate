@@ -12,7 +12,7 @@ import (
 func Migrateup() {
 	m, err := migrate.New(
 		"file://db/migration",
-		"postgres://root:167916@postgres:5432/roomate?sslmode=disable")
+		"postgres://root:167916@localhost:5432/roomate?sslmode=disable")
 	if err != nil {
 		log.Fatal().Err(err)
 	}

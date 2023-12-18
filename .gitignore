@@ -4,3 +4,4 @@
 *.work.sum
 makefile
 *.log
+*.pem
