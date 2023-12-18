@@ -64,4 +64,8 @@ const (
 	GetByEmail          = `SELECT id, role_name, password FROM users WHERE email = $1 AND is_deleted = false`
 	UpdatePassword      = `UPDATE users SET password = $2 WHERE id = $1 AND is_deleted = false RETURNING id, name, email, role_id, role_name, created_at, updated_at`
 	UpdateBookingStatus = `UPDATE bookings SET is_agree = $2, information = $3 WHERE id = $1 AND is_deleted = false RETURNING id, night, check_in, check_out, user_id, customer_id, is_agree, information, total_price, created_at, updated_at`
+	UpdateRoomStatus    = `UPDATE rooms SET status = 'booked' WHERE id = $1`
+	GetBookingOneDay    = `SELECT id, check_in, check_out, user_id, customer_id, is_agree, information, total_price FROM bookings WHERE check_in = $1`
+	GetBookingOneMonth  = `SELECT id, check_in, check_out, user_id, customer_id, is_agree, information, total_price FROM bookings WHERE EXTRACT(MONTH FROM "check_in") = $1 AND EXTRACT(YEAR FROM "check_in") = $2`
+	GetBookingOneYear   = `SELECT id, check_in, check_out, user_id, customer_id, is_agree, information, total_price FROM bookings WHERE EXTRACT(YEAR FROM "check_in") = $1`
 )

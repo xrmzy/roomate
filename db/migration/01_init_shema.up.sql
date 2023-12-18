@@ -1,5 +1,13 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+CREATE TABLE "roles" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "role_name" VARCHAR NOT NULL,
+  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
+  "updated_at" TIMESTAMP NOT NULL,
+  "is_deleted" BOOL DEFAULT false
+);
+
 CREATE TABLE "users" (
   "id" UUID PRIMARY KEY DEFAULT (uuid_generate_v4()),
   "name" VARCHAR NOT NULL,
@@ -7,14 +15,6 @@ CREATE TABLE "users" (
   "password" VARCHAR NOT NULL,
   "role_id" BIGINT NOT NULL,
   "role_name" VARCHAR,
-  "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
-  "updated_at" TIMESTAMP NOT NULL,
-  "is_deleted" BOOL DEFAULT false
-);
-
-CREATE TABLE "roles" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "role_name" VARCHAR NOT NULL,
   "created_at" TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" TIMESTAMP NOT NULL,
   "is_deleted" BOOL DEFAULT false
@@ -88,6 +88,8 @@ CREATE TABLE "booking_detail_services" (
   "is_deleted" BOOL DEFAULT false
 );
 
+ALTER TABLE "users" ADD FOREIGN KEY ("role_id") REFERENCES "roles" ("id");
+
 ALTER TABLE "bookings" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "bookings" ADD FOREIGN KEY ("customer_id") REFERENCES "customers" ("id");
@@ -95,8 +97,6 @@ ALTER TABLE "bookings" ADD FOREIGN KEY ("customer_id") REFERENCES "customers" ("
 ALTER TABLE "booking_details" ADD FOREIGN KEY ("booking_id") REFERENCES "bookings" ("id");
 
 ALTER TABLE "booking_details" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
-
-ALTER TABLE "users" ADD FOREIGN KEY ("role_id") REFERENCES "roles" ("id");
 
 ALTER TABLE "booking_detail_services" ADD FOREIGN KEY ("booking_detail_id") REFERENCES "booking_details" ("id");
 

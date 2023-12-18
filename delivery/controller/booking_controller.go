@@ -90,10 +90,10 @@ func (b *bookingController) UpdateBookingStatusHandler(ctx *gin.Context) {
 }
 
 func (b *bookingController) Route() {
-	allUser := b.rg.Group("/bookings", b.authMiddleware.RequireToken("admin, ga, employee"))
+	allUser := b.rg.Group("/bookings", b.authMiddleware.RequireToken("admin", "ga", "employee"))
 	allUser.GET("/:id", b.GetHandler)
 	allUser.GET("/", b.GetAllHandler)
-	b.rg.POST("/bookings/create", b.CreateHandler, b.authMiddleware.RequireToken("employee"))
+	b.rg.POST("/bookings", b.authMiddleware.RequireToken("employee"), b.CreateHandler)
 	b.rg.PUT("/bookings/status/", b.authMiddleware.RequireToken("ga"), b.UpdateBookingStatusHandler)
 }
 
