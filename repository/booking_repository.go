@@ -200,7 +200,6 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 			i.RoomId,
 			i.SubTotal,
 			time.Now().Truncate(time.Second),
-			time.Now().Truncate(time.Second),
 		).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,

@@ -37,7 +37,6 @@ var dummyService = entity.Service{
 	Id:        "2",
 	Name:      "Breakfast",
 	Price:     80000,
-	CreatedAt: time.Now().Truncate(time.Second),
 	UpdatedAt: time.Now().Truncate(time.Second),
 	IsDeleted: false,
 }
