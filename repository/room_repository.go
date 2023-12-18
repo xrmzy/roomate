@@ -83,7 +83,7 @@ func (r *roomRepository) Create(room entity.Room) (entity.Room, error) {
 		room.Facility,
 		room.Price,
 		"available",
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&room.Id,
 		&room.RoomNumber,

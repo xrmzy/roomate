@@ -66,7 +66,6 @@ func (r *serviceRepository) GetAll(limit, offset int) ([]entity.Service, error) 
 }
 
 func (r *serviceRepository) Create(service entity.Service) (entity.Service, error) {
-	service.Id = query.GenerateRoomID("S")
 	err := r.db.QueryRow(query.CreateService,
 		service.Id,
 		service.Name,

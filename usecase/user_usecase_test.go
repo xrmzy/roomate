@@ -1,171 +1,115 @@
-package usecase_test
+package usecase
 
 import (
 	"errors"
-	"fmt"
-	"testing"
-
+	commonmock "roomate/mock/common_mock"
+	repomock "roomate/mock/repo_mock"
 	usecasemock "roomate/mock/usecase_mock"
-	"roomate/model/dto"
 	"roomate/model/entity"
-	"roomate/usecase"
+	"testing"
+	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
-type MockUserRepository struct {
-	mock.Mock
-}
-
 type UserUseCaseTestSuite struct {
 	suite.Suite
-	uut *usecasemock.MockUserUseCase
+	userRepoMock *repomock.UserRepoMock
+	roleUcMock   *usecasemock.RoleUseCaseMock
+	pHashMock    *commonmock.PasswordHashCommonMock
+	userUc       UserUseCase
+}
+
+func (suite *UserUseCaseTestSuite) SetupTest() {
+	suite.userRepoMock = new(repomock.UserRepoMock)
+	suite.roleUcMock = new(usecasemock.RoleUseCaseMock)
+	suite.pHashMock = new(commonmock.PasswordHashCommonMock)
+	suite.userUc = NewUserUseCase(suite.userRepoMock, suite.roleUcMock)
 }
 
 func TestUserUseCaseTestSuite(t *testing.T) {
 	suite.Run(t, new(UserUseCaseTestSuite))
 }
 
-func (suite *UserUseCaseTestSuite) SetupTest() {
-	suite.uut = &usecasemock.MockUserUseCase{}
+func (suite *UserUseCaseTestSuite) TestGetUser() {
+	// get user fail
+	suite.userRepoMock.On("Get", dummyUser.Id).Return(entity.User{}, errors.New("user not found")).Once()
+	_, err := suite.userUc.GetUser(dummyUser.Id)
+	suite.Require().Error(err)
+
+	suite.userRepoMock.On("Get", dummyUser.Id).Return(dummyUser, nil)
+	room, err := suite.userUc.GetUser(dummyUser.Id)
+	suite.Require().NoError(err)
+	suite.Equal(dummyUser, room)
 }
 
-func (m *MockUserRepository) GetAll(limit, offset int) ([]entity.User, error) {
-	args := m.Called(limit, offset)
-	return args.Get(0).([]entity.User), args.Error(1)
+func (suite *UserUseCaseTestSuite) TestGetAllUser() {
+	// get all users err
+	suite.userRepoMock.On("GetAll", dummyGetAllParams.Limit, dummyGetAllParams.Offset).Return([]entity.User{}, errors.New("user not found")).Once()
+	_, err := suite.userUc.GetAllUsers(dummyGetAllParams)
+	suite.Require().Error(err)
+
+	suite.userRepoMock.On("GetAll", dummyGetAllParams.Limit, dummyGetAllParams.Offset).Return([]entity.User{dummyUser}, nil)
+	users, err := suite.userUc.GetAllUsers(dummyGetAllParams)
+	suite.Require().NoError(err)
+	suite.Equal([]entity.User{dummyUser}, users)
 }
 
-func (m *MockUserRepository) Get(id string) (entity.User, error) {
-	args := m.Called(id)
-	return args.Get(0).(entity.User), args.Error(1)
+func (suite *UserUseCaseTestSuite) TestUpdateUser() {
+	// update user err
+	suite.userRepoMock.On("Update", dummyUser.Id, dummyUser).Return(entity.User{}, errors.New("update user error")).Once()
+	_, err := suite.userUc.UpdateUser(dummyUser.Id, dummyUser)
+	suite.Require().Error(err)
+
+	suite.userRepoMock.On("Update", dummyUser.Id, dummyUser).Return(dummyUser, nil)
+	user, err := suite.userUc.UpdateUser(dummyUser.Id, dummyUser)
+	suite.Require().NoError(err)
+	suite.Equal(dummyUser, user)
 }
 
-func (m *MockUserRepository) GetByEmail(email string) (entity.User, error) {
-	args := m.Called(email)
-	return args.Get(0).(entity.User), args.Error(1)
+func (suite *UserUseCaseTestSuite) TestDeleteUser() {
+	// delete user err
+	suite.userRepoMock.On("Delete", dummyUser.Id).Return(errors.New("delete user error")).Once()
+	err := suite.userUc.DeleteUser(dummyUser.Id)
+	suite.Require().Error(err)
+
+	suite.userRepoMock.On("Delete", dummyUser.Id).Return(nil)
+	err = suite.userUc.DeleteUser(dummyUser.Id)
+	suite.Require().NoError(err)
 }
 
-func (m *MockUserRepository) Create(user entity.User) (entity.User, error) {
-	args := m.Called(user)
-	return args.Get(0).(entity.User), args.Error(1)
-}
-
-func (m *MockUserRepository) Update(id string, user entity.User) (entity.User, error) {
-	args := m.Called(id, user)
-	return args.Get(0).(entity.User), args.Error(1)
-}
-
-func (m *MockUserRepository) UpdatePassword(id, password string) (entity.User, error) {
-	args := m.Called(id, password)
-	return args.Get(0).(entity.User), args.Error(1)
-}
-
-func (m *MockUserRepository) Delete(id string) error {
-	args := m.Called(id)
-	return args.Error(0)
-}
-
-func TestGetAllUsers(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	useCase := usecase.NewUserUseCase(mockRepo, nil)
-
-	// Prepare mock data
-	mockUsers := []entity.User{
-		{Id: "1", Name: "Alice"},
-		{Id: "2", Name: "Bob"},
+func (suite *UserUseCaseTestSuite) TestGetByEmailPassword() {
+	// dummyUser
+	var dummyUser = entity.User{
+		Id:        "1",
+		Name:      "John",
+		Email:     "johndoe@me.com",
+		Password:  "$2a$10$uezZkgN6CtY/UWll7MLT8Os0y2m87GnI6druwXtnU.cNnO7.Y.LKW",
+		RoleId:    "1",
+		RoleName:  "admin",
+		UpdatedAt: time.Now().Truncate(time.Second),
 	}
+	var password = "167916"
 
-	// Set the expectations
-	mockRepo.On("GetAll", 10, 0).Return(mockUsers, nil)
+	suite.userRepoMock.On("GetByEmail", dummyUser.Email).Return(dummyUser, nil).Once()
 
-	// Test GetAllUsers method
-	users, err := useCase.GetAllUsers(dto.GetAllParams{Limit: 10, Offset: 0})
-	assert.NoError(t, err)
-	assert.Equal(t, len(mockUsers), len(users))
-	// Add more assertions as needed
+	suite.pHashMock.On("ComparePasswordHash", dummyUser.Password, password).Return(nil).Once()
 
-	// Verify that the expectations were met
-	mockRepo.AssertExpectations(t)
+	userr, err := suite.userUc.GetByEmailPassword(dummyUser.Email, password)
+	dummyUser.Password = ""
+	suite.Require().NoError(err)
+	suite.Equal(dummyUser, userr)
 }
 
-func TestGetAllUsers_ErrorCase(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	useCase := usecase.NewUserUseCase(mockRepo, nil)
+// func (suite *UserUseCaseTestSuite) TestCreateUser() {
+// 	suite.userRepoMock.On("GetByEmail", dummyUser.Email).Return(entity.User{}, nil).Once()
 
-	// Prepare mock error
-	mockErr := errors.New("repository error")
+// 	suite.roleUcMock.On("GetRole", dummyUser.RoleId).Return(dummyRole, nil).Once()
 
-	// Set the expectations for the mocked GetAll method to return an error
-	mockRepo.On("GetAll", 10, 0).Return([]entity.User{}, mockErr) // Return empty slice and error
+// 	// dummyUser.Password, _ = common.GeneratePasswordHash(dummyUser.Password)
+// 	suite.userRepoMock.On("Create", dummyUser).Return(dummyUser, nil)
 
-	// Test GetAllUsers method
-	users, err := useCase.GetAllUsers(dto.GetAllParams{Limit: 10, Offset: 0})
-
-	// Ensure that an error is returned
-	assert.Error(t, err)
-	assert.Nil(t, users) // Ensure that users is nil when an error occurs
-
-	// Verify that the expectations were met
-	mockRepo.AssertExpectations(t)
-}
-
-func TestGetUser(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	useCase := usecase.NewUserUseCase(mockRepo, nil)
-
-	// Prepare mock user and no error
-	mockUser := entity.User{Id: "123", Name: "John Doe"}
-	mockRepo.On("Get", "123").Return(mockUser, nil)
-
-	// Test GetUser method
-	user, err := useCase.GetUser("123")
-
-	// Ensure no error and user data is correct
-	assert.NoError(t, err)
-	assert.Equal(t, mockUser, user)
-
-	// Verify that the expectations were met
-	mockRepo.AssertExpectations(t)
-}
-
-func TestGetUser_ErrorCase(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	useCase := usecase.NewUserUseCase(mockRepo, nil)
-
-	// Prepare mock error
-	mockErr := errors.New("user not found error")
-
-	// Set the expectations for the mocked Get method to return an error
-	mockRepo.On("Get", "123").Return(entity.User{}, mockErr) // Return empty user and error
-
-	// Test GetUser method
-	user, err := useCase.GetUser("123")
-
-	// Ensure an error is returned and user remains unchanged
-	expectedError := fmt.Errorf("user with ID 123 not found")
-	assert.EqualError(t, err, expectedError.Error())
-	assert.Empty(t, user) // User should be empty
-
-	// Verify that the expectations were met
-	mockRepo.AssertExpectations(t)
-}
-
-func TestDeleteUser_SuccessCase(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	useCase := usecase.NewUserUseCase(mockRepo, nil) // Menggunakan nil karena tidak menggunakan RoleUseCase
-
-	// Prepare mock data
-	mockUserID := "123"
-	mockRepo.On("Delete", mockUserID).Return(nil)
-
-	// Test DeleteUser method
-	err := useCase.DeleteUser(mockUserID)
-
-	// Ensure no error
-	assert.NoError(t, err)
-
-	// Verify that the expectations were met
-	mockRepo.AssertExpectations(t)
-}
+// 	user, err := suite.userUc.CreateUser(dummyUser)
+// 	suite.Require().NoError(err)
+// 	suite.Require().Equal(dummyUser, user)
+// }

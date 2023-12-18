@@ -9,7 +9,6 @@ type SheetData struct {
 	IsAgree      bool
 	Information  string
 	TotalPrice   int
-	Date         string
 }
 
 type GetBookingOneDayParams struct {

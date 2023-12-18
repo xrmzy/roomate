@@ -1,0 +1,37 @@
+package usecasemock
+
+import (
+	"roomate/model/dto"
+	"roomate/model/entity"
+
+	"github.com/stretchr/testify/mock"
+)
+
+type RoleUseCaseMock struct {
+	mock.Mock
+}
+
+func (u *RoleUseCaseMock) GetAllRoles(payload dto.GetAllParams) ([]entity.Role, error) {
+	args := u.Called(payload)
+	return args.Get(0).([]entity.Role), args.Error(1)
+}
+
+func (u *RoleUseCaseMock) GetRole(id string) (entity.Role, error) {
+	args := u.Called(id)
+	return args.Get(0).(entity.Role), args.Error(1)
+}
+
+func (u *RoleUseCaseMock) CreateRole(role entity.Role) (entity.Role, error) {
+	args := u.Called(role)
+	return args.Get(0).(entity.Role), args.Error(1)
+}
+
+func (u *RoleUseCaseMock) UpdateRole(id string, role entity.Role) (entity.Role, error) {
+	args := u.Called(id, role)
+	return args.Get(0).(entity.Role), args.Error(1)
+}
+
+func (u *RoleUseCaseMock) DeleteRole(id string) error {
+	args := u.Called(id)
+	return args.Error(0)
+}

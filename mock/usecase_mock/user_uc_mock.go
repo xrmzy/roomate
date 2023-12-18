@@ -7,41 +7,41 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockUserUseCase struct {
+type UserUseCaseMock struct {
 	mock.Mock
 }
 
-func (m *MockUserUseCase) GetAllUsers(payload dto.GetAllParams) ([]entity.User, error) {
-	args := m.Called(payload)
+func (u *UserUseCaseMock) GetAllUsers(payload dto.GetAllParams) ([]entity.User, error) {
+	args := u.Called(payload)
 	return args.Get(0).([]entity.User), args.Error(1)
 }
 
-func (m *MockUserUseCase) GetUser(id string) (entity.User, error) {
-	args := m.Called(id)
+func (u *UserUseCaseMock) GetUser(id string) (entity.User, error) {
+	args := u.Called(id)
 	return args.Get(0).(entity.User), args.Error(1)
 }
 
-func (m *MockUserUseCase) GetByEmailPassword(email, password string) (entity.User, error) {
-	args := m.Called(email, password)
+func (u *UserUseCaseMock) GetByEmailPassword(email, password string) (entity.User, error) {
+	args := u.Called(email, password)
 	return args.Get(0).(entity.User), args.Error(1)
 }
 
-func (m *MockUserUseCase) CreateUser(user entity.User) (entity.User, error) {
-	args := m.Called(user)
+func (u *UserUseCaseMock) CreateUser(user entity.User) (entity.User, error) {
+	args := u.Called(user)
 	return args.Get(0).(entity.User), args.Error(1)
 }
 
-func (m *MockUserUseCase) UpdateUser(id string, user entity.User) (entity.User, error) {
-	args := m.Called(id, user)
+func (u *UserUseCaseMock) UpdateUser(id string, user entity.User) (entity.User, error) {
+	args := u.Called(id, user)
 	return args.Get(0).(entity.User), args.Error(1)
 }
 
-func (m *MockUserUseCase) UpdatePassword(id, password string) (entity.User, error) {
-	args := m.Called(id, password)
+func (u *UserUseCaseMock) UpdatePassword(id, password string) (entity.User, error) {
+	args := u.Called(id, password)
 	return args.Get(0).(entity.User), args.Error(1)
 }
 
-func (m *MockUserUseCase) DeleteUser(id string) error {
-	args := m.Called(id)
+func (u *UserUseCaseMock) DeleteUser(id string) error {
+	args := u.Called(id)
 	return args.Error(0)
 }

@@ -1,4 +1,3 @@
-go.sum
 .env
-makefile
-.log
+*.log
+coverage.out

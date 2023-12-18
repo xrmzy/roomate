@@ -7,31 +7,31 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockCustomerUseCase struct {
+type CustomerUseCaseMock struct {
 	mock.Mock
 }
 
-func (m *MockCustomerUseCase) GetAllCustomers(payload dto.GetAllParams) ([]entity.Customer, error) {
-	args := m.Called(payload)
+func (c *CustomerUseCaseMock) GetAllCustomers(payload dto.GetAllParams) ([]entity.Customer, error) {
+	args := c.Called(payload)
 	return args.Get(0).([]entity.Customer), args.Error(1)
 }
 
-func (m *MockCustomerUseCase) GetCustomer(id string) (entity.Customer, error) {
-	args := m.Called(id)
+func (c *CustomerUseCaseMock) GetCustomer(id string) (entity.Customer, error) {
+	args := c.Called(id)
 	return args.Get(0).(entity.Customer), args.Error(1)
 }
 
-func (m *MockCustomerUseCase) CreateCustomer(customer entity.Customer) (entity.Customer, error) {
-	args := m.Called(customer)
+func (c *CustomerUseCaseMock) CreateCustomer(customer entity.Customer) (entity.Customer, error) {
+	args := c.Called(customer)
 	return args.Get(0).(entity.Customer), args.Error(1)
 }
 
-func (m *MockCustomerUseCase) UpdateCustomer(id string, customer entity.Customer) (entity.Customer, error) {
-	args := m.Called(id, customer)
+func (c *CustomerUseCaseMock) UpdateCustomer(id string, customer entity.Customer) (entity.Customer, error) {
+	args := c.Called(id, customer)
 	return args.Get(0).(entity.Customer), args.Error(1)
 }
 
-func (m *MockCustomerUseCase) DeleteCustomer(id string) error {
-	args := m.Called(id)
+func (c *CustomerUseCaseMock) DeleteCustomer(id string) error {
+	args := c.Called(id)
 	return args.Error(0)
 }

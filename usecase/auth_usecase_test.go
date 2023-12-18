@@ -1,10 +1,12 @@
-package usecase
+package usecase_test
 
 import (
 	"errors"
+	commonmock "roomate/mock/common_mock"
 	usecasemock "roomate/mock/usecase_mock"
 	"roomate/model/dto"
 	"roomate/model/entity"
+	"roomate/usecase"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,8 +15,8 @@ import (
 
 type AuthUseCaseTestSuite struct {
 	suite.Suite
-	uum *usecasemock.MockUserUseCase
-	jum *usecasemock.MockJwtToken
+	uum *usecasemock.UserUseCaseMock
+	jum *commonmock.MockJwtToken
 }
 
 func TestAuthUseCaseTestSuite(t *testing.T) {
@@ -22,8 +24,8 @@ func TestAuthUseCaseTestSuite(t *testing.T) {
 }
 
 func (suite *AuthUseCaseTestSuite) SetupTest() {
-	suite.uum = &usecasemock.MockUserUseCase{}
-	suite.jum = &usecasemock.MockJwtToken{}
+	suite.uum = &usecasemock.UserUseCaseMock{}
+	suite.jum = &commonmock.MockJwtToken{}
 }
 
 func (suite *AuthUseCaseTestSuite) TestLogin_Success() {
@@ -59,7 +61,7 @@ func (suite *AuthUseCaseTestSuite) TestLogin_GetByEmailPasswordError() {
 	suite.uum.On("GetByEmailPassword", "test@example.com", "password").Return(entity.User{}, mockError)
 
 	// Membuat instance dari AuthUseCase menggunakan mock yang sudah disiapkan
-	authUC := NewAuthUseCase(suite.uum, suite.jum)
+	authUC := usecase.NewAuthUseCase(suite.uum, suite.jum)
 
 	// Payload yang akan digunakan untuk Login
 	payload := dto.AuthRequestDto{Email: "test@example.com", Password: "password"}

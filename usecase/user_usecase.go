@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 	"roomate/model/dto"
 	"roomate/model/entity"
@@ -23,23 +24,12 @@ type userUseCase struct {
 	roleUc   RoleUseCase
 }
 
-// func (u *userUseCase) GetAllUsers(payload dto.GetAllParams) ([]entity.User, error) {
-// 	users, err := u.userRepo.GetAll(payload.Limit, payload.Offset)
-// 	if err != nil {
-// 		return users, err
-// 	}
-
-// 	return users, nil
-// }
-
 func (u *userUseCase) GetAllUsers(payload dto.GetAllParams) ([]entity.User, error) {
 	users, err := u.userRepo.GetAll(payload.Limit, payload.Offset)
 	if err != nil {
-		return nil, err
+		return users, err
 	}
-	if users == nil {
-		return []entity.User{}, nil
-	}
+
 	return users, nil
 }
 
@@ -69,6 +59,17 @@ func (u *userUseCase) GetByEmailPassword(email, password string) (entity.User, e
 }
 
 func (u *userUseCase) CreateUser(user entity.User) (entity.User, error) {
+	// check if user already exist
+	userCheck, err := u.userRepo.GetByEmail(user.Email)
+	if err != nil {
+		return user, nil
+	}
+
+	// if user already exist, return error with message "email already exist"
+	if userCheck.Id != "" {
+		return user, errors.New("email already exist")
+	}
+
 	role, err := u.roleUc.GetRole(user.RoleId)
 	if err != nil {
 		return user, err
@@ -80,8 +81,6 @@ func (u *userUseCase) CreateUser(user entity.User) (entity.User, error) {
 	if err != nil {
 		return user, err
 	}
-
-	//lowercase email
 
 	user.Password = hashedPassword
 
