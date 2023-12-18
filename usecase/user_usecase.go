@@ -23,12 +23,23 @@ type userUseCase struct {
 	roleUc   RoleUseCase
 }
 
+// func (u *userUseCase) GetAllUsers(payload dto.GetAllParams) ([]entity.User, error) {
+// 	users, err := u.userRepo.GetAll(payload.Limit, payload.Offset)
+// 	if err != nil {
+// 		return users, err
+// 	}
+
+// 	return users, nil
+// }
+
 func (u *userUseCase) GetAllUsers(payload dto.GetAllParams) ([]entity.User, error) {
 	users, err := u.userRepo.GetAll(payload.Limit, payload.Offset)
 	if err != nil {
-		return users, err
+		return nil, err
 	}
-
+	if users == nil {
+		return []entity.User{}, nil
+	}
 	return users, nil
 }
 

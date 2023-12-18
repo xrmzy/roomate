@@ -4,6 +4,7 @@ import (
 	"roomate/model/dto"
 	"roomate/model/entity"
 	"roomate/repository"
+	"roomate/utils/common"
 )
 
 type ServiceUseCase interface {
@@ -36,7 +37,11 @@ func (u *serviceUseCase) GetService(id string) (entity.Service, error) {
 	return service, nil
 }
 
+var serviceId = common.GenerateRandomId("R")
+
 func (u *serviceUseCase) CreateService(service entity.Service) (entity.Service, error) {
+	service.Id = serviceId
+
 	service, err := u.serviceRepo.Create(service)
 	if err != nil {
 		return service, err
