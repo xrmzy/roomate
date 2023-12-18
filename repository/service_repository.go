@@ -28,7 +28,7 @@ func (r *serviceRepository) Get(id string) (entity.Service, error) {
 			&service.Price,
 			&service.CreatedAt,
 			&service.UpdatedAt,
-			&service.IsDeleted)
+		)
 
 	if err != nil {
 		return service, err
@@ -53,7 +53,7 @@ func (r *serviceRepository) GetAll(limit, offset int) ([]entity.Service, error) 
 			&service.Price,
 			&service.CreatedAt,
 			&service.UpdatedAt,
-			&service.IsDeleted)
+		)
 
 		if err != nil {
 			return services, err
@@ -70,14 +70,14 @@ func (r *serviceRepository) Create(service entity.Service) (entity.Service, erro
 		service.Id,
 		service.Name,
 		service.Price,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&service.Id,
 		&service.Name,
 		&service.Price,
 		&service.CreatedAt,
 		&service.UpdatedAt,
-		&service.IsDeleted)
+	)
 
 	if err != nil {
 		return service, err
@@ -91,14 +91,14 @@ func (r *serviceRepository) Update(id string, service entity.Service) (entity.Se
 		id,
 		service.Name,
 		service.Price,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&service.Id,
 		&service.Name,
 		&service.Price,
 		&service.CreatedAt,
 		&service.UpdatedAt,
-		&service.IsDeleted)
+	)
 
 	if err != nil {
 		return service, err

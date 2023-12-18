@@ -27,7 +27,7 @@ func (r *roleRepository) Get(id string) (entity.Role, error) {
 			&role.RoleName,
 			&role.CreatedAt,
 			&role.UpdatedAt,
-			&role.IsDeleted)
+		)
 
 	if err != nil {
 		return role, err
@@ -51,7 +51,7 @@ func (r *roleRepository) GetAll(limit, offset int) ([]entity.Role, error) {
 			&role.RoleName,
 			&role.CreatedAt,
 			&role.UpdatedAt,
-			&role.IsDeleted)
+		)
 
 		if err != nil {
 			return roles, err
@@ -66,13 +66,13 @@ func (r *roleRepository) GetAll(limit, offset int) ([]entity.Role, error) {
 func (r *roleRepository) Create(role entity.Role) (entity.Role, error) {
 	err := r.db.QueryRow(query.CreateRole,
 		role.RoleName,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&role.Id,
 		&role.RoleName,
 		&role.CreatedAt,
 		&role.UpdatedAt,
-		&role.IsDeleted)
+	)
 
 	if err != nil {
 		return role, err
@@ -85,13 +85,13 @@ func (r *roleRepository) Update(id string, role entity.Role) (entity.Role, error
 	err := r.db.QueryRow(query.UpdateRole,
 		id,
 		role.RoleName,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&role.Id,
 		&role.RoleName,
 		&role.CreatedAt,
 		&role.UpdatedAt,
-		&role.IsDeleted)
+	)
 
 	if err != nil {
 		return role, err
