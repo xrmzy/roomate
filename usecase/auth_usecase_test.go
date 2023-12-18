@@ -1,11 +1,10 @@
-package usecase_test
+package usecase
 
 import (
 	"errors"
 	usecasemock "roomate/mock/usecase_mock"
 	"roomate/model/dto"
 	"roomate/model/entity"
-	"roomate/usecase"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,7 +35,7 @@ func (suite *AuthUseCaseTestSuite) TestLogin_Success() {
 	suite.jum.On("GenerateToken", mockUser).Return(mockToken, nil)
 
 	// Membuat instance dari AuthUseCase menggunakan mock yang sudah disiapkan
-	authUC := usecase.NewAuthUseCase(suite.uum, suite.jum)
+	authUC := NewAuthUseCase(suite.uum, suite.jum)
 
 	// Payload yang akan digunakan untuk Login
 	payload := dto.AuthRequestDto{Email: "test@example.com", Password: "password"}
@@ -60,7 +59,7 @@ func (suite *AuthUseCaseTestSuite) TestLogin_GetByEmailPasswordError() {
 	suite.uum.On("GetByEmailPassword", "test@example.com", "password").Return(entity.User{}, mockError)
 
 	// Membuat instance dari AuthUseCase menggunakan mock yang sudah disiapkan
-	authUC := usecase.NewAuthUseCase(suite.uum, suite.jum)
+	authUC := NewAuthUseCase(suite.uum, suite.jum)
 
 	// Payload yang akan digunakan untuk Login
 	payload := dto.AuthRequestDto{Email: "test@example.com", Password: "password"}
@@ -86,7 +85,7 @@ func (suite *AuthUseCaseTestSuite) TestLogin_GenerateTokenError() {
 	suite.jum.On("GenerateToken", mockUser).Return(dto.AuthResponseDto{}, mockError)
 
 	// Membuat instance dari AuthUseCase menggunakan mock yang sudah disiapkan
-	authUC := usecase.NewAuthUseCase(suite.uum, suite.jum)
+	authUC := NewAuthUseCase(suite.uum, suite.jum)
 
 	// Payload yang akan digunakan untuk Login
 	payload := dto.AuthRequestDto{Email: "test@example.com", Password: "password"}
