@@ -34,7 +34,7 @@ func TestRoleControllerTestSuite(t *testing.T) {
 }
 
 var dummyRole = entity.Role{
-	Id:        1,
+	Id:        "1",
 	RoleName:  "Admin",
 	CreatedAt: time.Now(),
 	UpdatedAt: time.Now(),
@@ -131,8 +131,8 @@ func (suite *RoleControllerTestSuite) TestGetAllHandler_Success() {
 
 	// Menyusun ekspetasi panggilan fungsi di UseCase
 	suite.rum.On("GetAllRoles", mock.AnythingOfType("dto.GetAllParams")).Return([]entity.Role{
-		{Id: 1, RoleName: "Admin"},
-		{Id: 2, RoleName: "Employee"},
+		{Id: "1", RoleName: "Admin"},
+		{Id: "2", RoleName: "Employee"},
 	}, nil)
 
 	// Membuat RoleController instance

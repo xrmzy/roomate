@@ -24,7 +24,7 @@ func TestRoleUseCaseTestSuite(t *testing.T) {
 }
 
 var dummyRole = entity.Role{
-	Id:       1,
+	Id:       "1",
 	RoleName: "admin",
 }
 
