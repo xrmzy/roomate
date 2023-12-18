@@ -45,6 +45,7 @@ func (b *bookingRepository) Get(id string) (entity.Booking, error) {
 		return booking, err
 	}
 
+	// get all booking details
 	var bookingDetails []entity.BookingDetail
 	rows, err := b.db.Query(query.GetAllBookingDetails, booking.Id)
 	if err != nil {
@@ -67,6 +68,33 @@ func (b *bookingRepository) Get(id string) (entity.Booking, error) {
 			return booking, err
 		}
 
+		// get all booking detail services
+		var services []entity.BookingDetailService
+		rows, err := b.db.Query(query.GetAllBookingDetailServices, bookingDetail.Id)
+		if err != nil {
+			return booking, err
+		}
+
+		for rows.Next() {
+			var service entity.BookingDetailService
+			err := rows.Scan(
+				&service.Id,
+				&service.BookingDetailId,
+				&service.ServiceId,
+				&service.ServiceName,
+				&service.CreatedAt,
+				&service.UpdatedAt,
+				&service.IsDeleted,
+			)
+
+			if err != nil {
+				return booking, err
+			}
+
+			services = append(services, service)
+		}
+
+		bookingDetail.Services = services
 		bookingDetails = append(bookingDetails, bookingDetail)
 	}
 
@@ -121,7 +149,7 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 		booking.UserId,
 		booking.CustomerId,
 		booking.TotalPrice,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&booking.Id,
 		&booking.Night,
@@ -151,7 +179,7 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 			booking.Id,
 			i.RoomId,
 			i.SubTotal,
-			time.Now(),
+			time.Now().Truncate(time.Second),
 		).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
@@ -175,7 +203,7 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 				bookingDetail.Id,
 				j.ServiceId,
 				j.ServiceName,
-				time.Now(),
+				time.Now().Truncate(time.Second),
 			).Scan(
 				&service.Id,
 				&service.BookingDetailId,
@@ -228,6 +256,8 @@ func (b *bookingRepository) UpdateStatus(id string, isAgree bool, information st
 	if err != nil {
 		return booking, err
 	}
+
+	b.db.Query(query.UpdateBookingStatus, id, isAgree, information)
 
 	return booking, nil
 }

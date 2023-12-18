@@ -78,6 +78,7 @@ func (c *Config) readConfig() error {
 		SpreadsheetId:     os.Getenv("SPREADSHEET_ID"),
 	}
 
+
 	if c.ApiConfig.ApiPort == "" || c.DbConfig.Driver == "" || c.DbConfig.Host == "" || c.DbConfig.DbName == "" || c.DbConfig.Port == "" || c.DbConfig.Username == "" || c.DbConfig.Password == "" {
 		return errors.New("all environment variables required")
 	}

@@ -38,7 +38,7 @@ func (u *serviceUseCase) GetService(id string) (entity.Service, error) {
 }
 
 func (u *serviceUseCase) CreateService(service entity.Service) (entity.Service, error) {
-	service.Id = common.GenerateRandomId("S")
+	service.Id = common.GenerateRandomId("R")
 
 	service, err := u.serviceRepo.Create(service)
 	if err != nil {

@@ -17,15 +17,12 @@ type BookingUsecase interface {
 
 type bookingUsecase struct {
 	bookingRepo repository.BookingRepository
-	userUc      UserUseCase
-	customerUc  CustomerUseCase
 	roomUc      RoomUseCase
 	serviceUc   ServiceUseCase
 }
 
 func (u *bookingUsecase) GetAllBookings(payload dto.GetAllParams) ([]entity.Booking, error) {
 	bookings, err := u.bookingRepo.GetAll(payload.Limit, payload.Offset)
-
 	if err != nil {
 		return bookings, err
 	}
@@ -35,7 +32,6 @@ func (u *bookingUsecase) GetAllBookings(payload dto.GetAllParams) ([]entity.Book
 
 func (u *bookingUsecase) GetBooking(id string) (entity.Booking, error) {
 	booking, err := u.bookingRepo.Get(id)
-
 	if err != nil {
 		return booking, err
 	}
@@ -119,9 +115,23 @@ func (u *bookingUsecase) CreateBooking(payload dto.CreateBookingParams) (entity.
 
 func (u *bookingUsecase) UpdateBookingStatus(payload dto.UpdateBookingStatusParams) (entity.Booking, error) {
 	booking, err := u.bookingRepo.UpdateStatus(payload.BookingId, payload.IsAgree, payload.Information)
-
 	if err != nil {
 		return booking, err
+	}
+
+	if payload.IsAgree {
+		newBooking, err := u.bookingRepo.Get(payload.BookingId)
+		if err != nil {
+			return booking, err
+		}
+
+		// update room status to booked
+		for _, bookingDetail := range newBooking.BookingDetails {
+			err := u.roomUc.UpdateStatus(bookingDetail.RoomId)
+			if err != nil {
+				return booking, err
+			}
+		}
 	}
 
 	return booking, nil
@@ -129,15 +139,11 @@ func (u *bookingUsecase) UpdateBookingStatus(payload dto.UpdateBookingStatusPara
 
 func NewBookingUseCase(
 	bookingRepo repository.BookingRepository,
-	userUc UserUseCase,
-	customerUc CustomerUseCase,
 	roomUc RoomUseCase,
 	serviceUc ServiceUseCase,
 ) BookingUsecase {
 	return &bookingUsecase{
 		bookingRepo: bookingRepo,
-		userUc:      userUc,
-		customerUc:  customerUc,
 		roomUc:      roomUc,
 		serviceUc:   serviceUc,
 	}

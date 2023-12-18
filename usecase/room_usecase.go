@@ -12,6 +12,7 @@ type RoomUseCase interface {
 	GetRoom(id string) (entity.Room, error)
 	CreateRoom(room entity.Room) (entity.Room, error)
 	UpdateRoom(id string, room entity.Room) (entity.Room, error)
+	UpdateStatus(id string) error
 	DeleteRoom(id string) error
 }
 
@@ -55,6 +56,15 @@ func (u *roomUseCase) UpdateRoom(id string, room entity.Room) (entity.Room, erro
 	}
 
 	return room, nil
+}
+
+func (u *roomUseCase) UpdateStatus(id string) error {
+	err := u.roomRepo.UpdateStatus(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (u *roomUseCase) DeleteRoom(id string) error {

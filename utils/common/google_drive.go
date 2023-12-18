@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"io"
 	"net/http"
-	"os"
 	"roomate/config"
 
 	"golang.org/x/oauth2/google"
@@ -17,7 +15,7 @@ import (
 
 type GDrive interface {
 	NewService() (*drive.Service, error)
-	Download(service *drive.Service) error
+	Download(service *drive.Service) (*http.Response, error)
 }
 
 type gDrive struct {
@@ -48,28 +46,16 @@ func (g *gDrive) NewService() (*drive.Service, error) {
 	return service, nil
 }
 
-func (g *gDrive) Download(service *drive.Service) error {
+func (g *gDrive) Download(service *drive.Service) (*http.Response, error) {
 	resp, err := service.Files.Export(g.cfg.SpreadsheetId, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").Download()
 	if err != nil {
 		if apiErr, ok := err.(*googleapi.Error); ok && apiErr.Code == http.StatusNotFound {
-			return errors.New("File not found: " + err.Error())
+			return resp, errors.New("File not found: " + err.Error())
 		}
-		return errors.New("Failed to download file: " + err.Error())
-	}
-	defer resp.Body.Close()
-
-	outFile, err := os.Create("output.xlsx")
-	if err != nil {
-		return errors.New("Failed to create output file: " + err.Error())
-	}
-	defer outFile.Close()
-
-	_, err = io.Copy(outFile, resp.Body)
-	if err != nil {
-		return errors.New("Failed to write to output file: " + err.Error())
+		return resp, errors.New("Failed to download file: " + err.Error())
 	}
 
-	return nil
+	return resp, nil
 }
 
 func NewGDrive(cfg config.SheetConfig) GDrive {

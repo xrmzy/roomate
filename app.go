@@ -1,6 +1,8 @@
 package main
 
-import "roomate/delivery"
+import (
+	"roomate/delivery"
+)
 
 func main() {
 	delivery.NewServer().Run()
