@@ -3,6 +3,7 @@ package usecase
 import (
 	repomock "roomate/mock/repo_mock"
 	"roomate/model/entity"
+	"roomate/utils/common"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -24,7 +25,7 @@ func TestServiceUseCaseTestSuite(t *testing.T) {
 }
 
 func (suite *ServiceUseCaseTestSuite) TestCreateService() {
-	dummyService.Id = serviceId
+	dummyService.Id = common.GenerateRandomId("R")
 	suite.srm.On("Create", dummyService).Return(dummyService, nil)
 	service, err := suite.su.CreateService(dummyService)
 	suite.Require().NoError(err)
@@ -32,8 +33,8 @@ func (suite *ServiceUseCaseTestSuite) TestCreateService() {
 }
 
 func (suite *ServiceUseCaseTestSuite) TestGetService() {
-	suite.srm.On("Get", serviceId).Return(dummyService, nil)
-	service, err := suite.su.GetService(serviceId)
+	suite.srm.On("Get", dummyService.Id).Return(dummyService, nil)
+	service, err := suite.su.GetService(dummyService.Id)
 	suite.Require().NoError(err)
 	suite.Equal(dummyService, service)
 }
@@ -46,14 +47,14 @@ func (suite *ServiceUseCaseTestSuite) TestGetAllService() {
 }
 
 func (suite *ServiceUseCaseTestSuite) TestUpdateService() {
-	suite.srm.On("Update", serviceId, dummyService).Return(dummyService, nil)
-	service, err := suite.su.UpdateService(serviceId, dummyService)
+	suite.srm.On("Update", dummyService.Id, dummyService).Return(dummyService, nil)
+	service, err := suite.su.UpdateService(dummyService.Id, dummyService)
 	suite.Require().NoError(err)
 	suite.Equal(dummyService, service)
 }
 
 func (suite *ServiceUseCaseTestSuite) TestDeleteService() {
-	suite.srm.On("Delete", serviceId).Return(nil)
-	err := suite.su.DeleteService(serviceId)
+	suite.srm.On("Delete", dummyService.Id).Return(nil)
+	err := suite.su.DeleteService(dummyService.Id)
 	suite.Require().NoError(err)
 }

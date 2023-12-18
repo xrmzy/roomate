@@ -93,7 +93,7 @@ func (u *userRepository) Create(user entity.User) (entity.User, error) {
 		user.Password,
 		user.RoleId,
 		user.RoleName,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&user.Id,
 		&user.Name,

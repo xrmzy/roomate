@@ -3,6 +3,7 @@ package usecase
 import (
 	repomock "roomate/mock/repo_mock"
 	"roomate/model/entity"
+	"roomate/utils/common"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -24,7 +25,7 @@ func TestRoomUseCaseTestSuite(t *testing.T) {
 }
 
 func (suite *RoomUseCaseTestSuite) TestCreateRoom() {
-	dummyRoom.Id = roomId
+	dummyRoom.Id = common.GenerateRandomId("R")
 	suite.rrm.On("Create", dummyRoom).Return(dummyRoom, nil)
 	room, err := suite.ru.CreateRoom(dummyRoom)
 	suite.Require().NoError(err)
@@ -32,8 +33,8 @@ func (suite *RoomUseCaseTestSuite) TestCreateRoom() {
 }
 
 func (suite *RoomUseCaseTestSuite) TestGetRoom() {
-	suite.rrm.On("Get", roomId).Return(dummyRoom, nil)
-	room, err := suite.ru.GetRoom(roomId)
+	suite.rrm.On("Get", dummyRoom.Id).Return(dummyRoom, nil)
+	room, err := suite.ru.GetRoom(dummyRoom.Id)
 	suite.Require().NoError(err)
 	suite.Equal(dummyRoom, room)
 }
@@ -46,20 +47,20 @@ func (suite *RoomUseCaseTestSuite) TestGetAllRooms() {
 }
 
 func (suite *RoomUseCaseTestSuite) TestUpdateRoom() {
-	suite.rrm.On("Update", roomId, dummyRoom).Return(dummyRoom, nil)
-	room, err := suite.ru.UpdateRoom(roomId, dummyRoom)
+	suite.rrm.On("Update", dummyRoom.Id, dummyRoom).Return(dummyRoom, nil)
+	room, err := suite.ru.UpdateRoom(dummyRoom.Id, dummyRoom)
 	suite.Require().NoError(err)
 	suite.Equal(dummyRoom, room)
 }
 
 func (suite *RoomUseCaseTestSuite) TestUpdateStatus() {
-	suite.rrm.On("UpdateStatus", roomId).Return(nil)
-	err := suite.ru.UpdateStatus(roomId)
+	suite.rrm.On("UpdateStatus", dummyRoom.Id).Return(nil)
+	err := suite.ru.UpdateStatus(dummyRoom.Id)
 	suite.Require().NoError(err)
 }
 
 func (suite *RoomUseCaseTestSuite) TestDeleteRoom() {
-	suite.rrm.On("Delete", roomId).Return(nil)
-	err := suite.ru.DeleteRoom(roomId)
+	suite.rrm.On("Delete", dummyRoom.Id).Return(nil)
+	err := suite.ru.DeleteRoom(dummyRoom.Id)
 	suite.Require().NoError(err)
 }
