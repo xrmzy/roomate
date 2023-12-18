@@ -21,6 +21,7 @@ type bookingRepository struct {
 
 func (b *bookingRepository) Get(id string) (entity.Booking, error) {
 	var booking entity.Booking
+
 	err := b.db.QueryRow(query.GetBooking, id).
 		Scan(
 			&booking.Id,
@@ -34,39 +35,17 @@ func (b *bookingRepository) Get(id string) (entity.Booking, error) {
 			&booking.TotalPrice,
 			&booking.CreatedAt,
 			&booking.UpdatedAt,
-			&booking.IsDeleted,
 		)
 
 	if err != nil {
 		return booking, err
 	}
 
-	var bookingDetails []entity.BookingDetail
-	rows, err := b.db.Query(query.GetAllBookingDetails, booking.Id)
+	booking.BookingDetails, err = b.getAllBookingDetails(id)
 	if err != nil {
 		return booking, err
 	}
 
-	for rows.Next() {
-		var bookingDetail entity.BookingDetail
-		err := rows.Scan(
-			&bookingDetail.Id,
-			&bookingDetail.BookingId,
-			&bookingDetail.RoomId,
-			&bookingDetail.SubTotal,
-			&bookingDetail.CreatedAt,
-			&bookingDetail.UpdatedAt,
-			&bookingDetail.IsDeleted,
-		)
-
-		if err != nil {
-			return booking, err
-		}
-
-		bookingDetails = append(bookingDetails, bookingDetail)
-	}
-
-	booking.BookingDetails = bookingDetails
 	return booking, nil
 }
 
@@ -76,6 +55,7 @@ func (b *bookingRepository) GetAll(limit, offset int) ([]entity.Booking, error) 
 	if err != nil {
 		return bookings, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var booking entity.Booking
@@ -91,17 +71,86 @@ func (b *bookingRepository) GetAll(limit, offset int) ([]entity.Booking, error) 
 			&booking.TotalPrice,
 			&booking.CreatedAt,
 			&booking.UpdatedAt,
-			&booking.IsDeleted,
 		)
 
 		if err != nil {
 			return bookings, err
 		}
 
+		bookingDetails, err := b.getAllBookingDetails(booking.Id)
+		if err != nil {
+			return bookings, err
+		}
+
+		booking.BookingDetails = bookingDetails
 		bookings = append(bookings, booking)
 	}
 
 	return bookings, nil
+}
+
+func (b *bookingRepository) getAllBookingDetails(bookingID string) ([]entity.BookingDetail, error) {
+	var bookingDetails []entity.BookingDetail
+	rows, err := b.db.Query(query.GetAllBookingDetails, bookingID)
+	if err != nil {
+		return bookingDetails, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var bookingDetail entity.BookingDetail
+		err := rows.Scan(
+			&bookingDetail.Id,
+			&bookingDetail.BookingId,
+			&bookingDetail.RoomId,
+			&bookingDetail.SubTotal,
+			&bookingDetail.CreatedAt,
+			&bookingDetail.UpdatedAt,
+		)
+
+		if err != nil {
+			return bookingDetails, err
+		}
+
+		services, err := b.getAllBookingDetailServices(bookingDetail.Id)
+		if err != nil {
+			return bookingDetails, err
+		}
+
+		bookingDetail.Services = services
+		bookingDetails = append(bookingDetails, bookingDetail)
+	}
+
+	return bookingDetails, nil
+}
+
+func (b *bookingRepository) getAllBookingDetailServices(bookingDetailID string) ([]entity.BookingDetailService, error) {
+	var services []entity.BookingDetailService
+	rows, err := b.db.Query(query.GetAllBookingDetailServices, bookingDetailID)
+	if err != nil {
+		return services, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var service entity.BookingDetailService
+		err := rows.Scan(
+			&service.Id,
+			&service.BookingDetailId,
+			&service.ServiceId,
+			&service.ServiceName,
+			&service.CreatedAt,
+			&service.UpdatedAt,
+		)
+
+		if err != nil {
+			return services, err
+		}
+
+		services = append(services, service)
+	}
+
+	return services, nil
 }
 
 func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, error) {
@@ -117,7 +166,7 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 		booking.UserId,
 		booking.CustomerId,
 		booking.TotalPrice,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&booking.Id,
 		&booking.Night,
@@ -130,7 +179,6 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 		&booking.TotalPrice,
 		&booking.CreatedAt,
 		&booking.UpdatedAt,
-		&booking.IsDeleted,
 	)
 
 	if err != nil {
@@ -147,7 +195,7 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 			booking.Id,
 			i.RoomId,
 			i.SubTotal,
-			time.Now(),
+			time.Now().Truncate(time.Second),
 		).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
@@ -155,7 +203,6 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 			&bookingDetail.SubTotal,
 			&bookingDetail.CreatedAt,
 			&bookingDetail.UpdatedAt,
-			&bookingDetail.IsDeleted,
 		)
 
 		if err != nil {
@@ -171,7 +218,7 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 				bookingDetail.Id,
 				j.ServiceId,
 				j.ServiceName,
-				time.Now(),
+				time.Now().Truncate(time.Second),
 			).Scan(
 				&service.Id,
 				&service.BookingDetailId,
@@ -179,7 +226,6 @@ func (b *bookingRepository) Create(booking entity.Booking) (entity.Booking, erro
 				&service.ServiceName,
 				&service.CreatedAt,
 				&service.UpdatedAt,
-				&service.IsDeleted,
 			)
 			if err != nil {
 				tx.Rollback()
@@ -218,7 +264,6 @@ func (b *bookingRepository) UpdateStatus(id string, isAgree bool, information st
 		&booking.TotalPrice,
 		&booking.CreatedAt,
 		&booking.UpdatedAt,
-		&booking.IsDeleted,
 	)
 
 	if err != nil {

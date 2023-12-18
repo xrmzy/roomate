@@ -1,4 +1,6 @@
-go.sum
-.env
+*.sum
+*.env
+*.work
+*.work.sum
 makefile
-.log
+*.log

@@ -4,6 +4,7 @@ import (
 	"roomate/model/dto"
 	"roomate/model/entity"
 	"roomate/repository"
+	"roomate/utils/common"
 )
 
 type RoomUseCase interface {
@@ -17,6 +18,8 @@ type RoomUseCase interface {
 type roomUseCase struct {
 	roomRepo repository.RoomRepository
 }
+
+var GenerateRoomID = common.GenerateID("R")
 
 func (u *roomUseCase) GetAllRooms(payload dto.GetAllParams) ([]entity.Room, error) {
 	rooms, err := u.roomRepo.GetAll(payload.Limit, payload.Offset)
@@ -37,6 +40,7 @@ func (u *roomUseCase) GetRoom(id string) (entity.Room, error) {
 }
 
 func (u *roomUseCase) CreateRoom(room entity.Room) (entity.Room, error) {
+	room.Id = GenerateRoomID
 	room, err := u.roomRepo.Create(room)
 	if err != nil {
 		return room, err

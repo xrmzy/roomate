@@ -32,7 +32,7 @@ func (r *roomRepository) Get(id string) (entity.Room, error) {
 			&room.Status,
 			&room.CreatedAt,
 			&room.UpdatedAt,
-			&room.IsDeleted)
+		)
 
 	if err != nil {
 		return room, err
@@ -61,7 +61,7 @@ func (r *roomRepository) GetAll(limit, offset int) ([]entity.Room, error) {
 			&room.Status,
 			&room.CreatedAt,
 			&room.UpdatedAt,
-			&room.IsDeleted)
+		)
 
 		if err != nil {
 			return rooms, err
@@ -74,7 +74,7 @@ func (r *roomRepository) GetAll(limit, offset int) ([]entity.Room, error) {
 }
 
 func (r *roomRepository) Create(room entity.Room) (entity.Room, error) {
-	room.Id = query.GenerateRoomID("R") // Membuat ID dengan prefiks "R"
+	// room.Id = query.GenerateID("R") // Membuat ID dengan prefiks "R"
 
 	err := r.db.QueryRow(query.CreateRoom,
 		room.Id,
@@ -84,7 +84,7 @@ func (r *roomRepository) Create(room entity.Room) (entity.Room, error) {
 		room.Facility,
 		room.Price,
 		"available",
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&room.Id,
 		&room.RoomNumber,
@@ -95,7 +95,7 @@ func (r *roomRepository) Create(room entity.Room) (entity.Room, error) {
 		&room.Status,
 		&room.CreatedAt,
 		&room.UpdatedAt,
-		&room.IsDeleted)
+	)
 
 	if err != nil {
 		return room, err
@@ -113,7 +113,7 @@ func (r *roomRepository) Update(id string, room entity.Room) (entity.Room, error
 		room.Facility,
 		room.Price,
 		room.Status,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&room.Id,
 		&room.RoomNumber,
@@ -124,7 +124,7 @@ func (r *roomRepository) Update(id string, room entity.Room) (entity.Room, error
 		&room.Status,
 		&room.CreatedAt,
 		&room.UpdatedAt,
-		&room.IsDeleted)
+	)
 
 	if err != nil {
 		return room, err
