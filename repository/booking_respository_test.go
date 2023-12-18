@@ -102,6 +102,7 @@ func (suite *BookingRepoTestSuite) TestRepository_CreateBooking() {
 		rows := sqlmock.NewRows([]string{
 			"id", "booking_id", "room_id", "sub_total", "created_at", "updated_at",
 		}).AddRow(i.Id, i.BookingId, i.RoomId, i.SubTotal, i.CreatedAt, i.UpdatedAt)
+
 		suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.CreateBookingDetail)).WithArgs(i.BookingId, i.RoomId, i.SubTotal, i.UpdatedAt).WillReturnRows(rows)
 
 		for _, j := range i.Services {
