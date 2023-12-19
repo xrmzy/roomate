@@ -30,7 +30,7 @@ func (r *customerRepository) Get(id string) (entity.Customer, error) {
 			&customer.PhoneNumber,
 			&customer.CreatedAt,
 			&customer.UpdatedAt,
-			&customer.IsDeleted)
+		)
 
 	if err != nil {
 		return customer, err
@@ -57,7 +57,7 @@ func (r *customerRepository) GetAll(limit, offset int) ([]entity.Customer, error
 			&customer.PhoneNumber,
 			&customer.CreatedAt,
 			&customer.UpdatedAt,
-			&customer.IsDeleted)
+		)
 
 		if err != nil {
 			return customers, err
@@ -75,7 +75,7 @@ func (r *customerRepository) Create(customer entity.Customer) (entity.Customer, 
 		customer.Email,
 		customer.Address,
 		customer.PhoneNumber,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&customer.Id,
 		&customer.Name,
@@ -84,7 +84,7 @@ func (r *customerRepository) Create(customer entity.Customer) (entity.Customer, 
 		&customer.PhoneNumber,
 		&customer.CreatedAt,
 		&customer.UpdatedAt,
-		&customer.IsDeleted)
+	)
 
 	if err != nil {
 		return customer, err
@@ -100,7 +100,7 @@ func (r *customerRepository) Update(id string, customer entity.Customer) (entity
 		customer.Email,
 		customer.Address,
 		customer.PhoneNumber,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&customer.Id,
 		&customer.Name,
@@ -109,7 +109,7 @@ func (r *customerRepository) Update(id string, customer entity.Customer) (entity
 		&customer.PhoneNumber,
 		&customer.CreatedAt,
 		&customer.UpdatedAt,
-		&customer.IsDeleted)
+	)
 
 	if err != nil {
 		return customer, err

@@ -25,7 +25,7 @@ func TestServiceUseCaseTestSuite(t *testing.T) {
 }
 
 func (suite *ServiceUseCaseTestSuite) TestCreateService() {
-	dummyService.Id = common.GenerateRandomId("R")
+	dummyService.Id = common.GenerateRandomId("S")
 	suite.srm.On("Create", dummyService).Return(dummyService, nil)
 	service, err := suite.su.CreateService(dummyService)
 	suite.Require().NoError(err)

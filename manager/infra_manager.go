@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"roomate/config"
-	"roomate/utils/common"
 )
 
 type InfraManager interface {
@@ -25,8 +24,6 @@ func (i *infraManager) openConn() error {
 	if err != nil {
 		return fmt.Errorf("failed to open connection %v", err.Error())
 	}
-
-	common.Migrateup()
 
 	i.db = db
 	return nil
