@@ -60,10 +60,7 @@ func (u *userUseCase) GetByEmailPassword(email, password string) (entity.User, e
 
 func (u *userUseCase) CreateUser(user entity.User) (entity.User, error) {
 	// check if user already exist
-	userCheck, err := u.userRepo.GetByEmail(user.Email)
-	if err != nil {
-		return user, nil
-	}
+	userCheck, _ := u.userRepo.GetByEmail(user.Email)
 
 	// if user already exist, return error with message "email already exist"
 	if userCheck.Id != "" {

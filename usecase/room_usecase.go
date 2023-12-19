@@ -20,6 +20,8 @@ type roomUseCase struct {
 	roomRepo repository.RoomRepository
 }
 
+var GenerateRoomID = common.GenerateID("R")
+
 func (u *roomUseCase) GetAllRooms(payload dto.GetAllParams) ([]entity.Room, error) {
 	rooms, err := u.roomRepo.GetAll(payload.Limit, payload.Offset)
 	if err != nil {

@@ -31,8 +31,7 @@ func (u *userRepository) Get(id string) (entity.User, error) {
 			&user.RoleId,
 			&user.RoleName,
 			&user.CreatedAt,
-			&user.UpdatedAt,
-			&user.IsDeleted)
+			&user.UpdatedAt)
 
 	if err != nil {
 		return user, err
@@ -48,6 +47,7 @@ func (u *userRepository) GetAll(limit, offset int) ([]entity.User, error) {
 	if err != nil {
 		return users, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var user entity.User
@@ -58,8 +58,7 @@ func (u *userRepository) GetAll(limit, offset int) ([]entity.User, error) {
 			&user.RoleId,
 			&user.RoleName,
 			&user.CreatedAt,
-			&user.UpdatedAt,
-			&user.IsDeleted)
+			&user.UpdatedAt)
 
 		if err != nil {
 			return users, err
@@ -77,8 +76,7 @@ func (u *userRepository) GetByEmail(email string) (entity.User, error) {
 		Scan(
 			&user.Id,
 			&user.RoleName,
-			&user.Password,
-		)
+			&user.Password)
 	if err != nil {
 		return user, err
 	}
@@ -101,9 +99,7 @@ func (u *userRepository) Create(user entity.User) (entity.User, error) {
 		&user.RoleId,
 		&user.RoleName,
 		&user.CreatedAt,
-		&user.UpdatedAt,
-		&user.IsDeleted,
-	)
+		&user.UpdatedAt)
 
 	if err != nil {
 		return user, err
@@ -121,16 +117,15 @@ func (u *userRepository) Update(id string, user entity.User) (entity.User, error
 		user.Email,
 		user.RoleId,
 		user.RoleName,
-		time.Now(),
+		time.Now().Truncate(time.Second),
 	).Scan(
 		&user.Id,
+		&user.Name,
 		&user.Email,
 		&user.RoleId,
 		&user.RoleName,
 		&user.CreatedAt,
-		&user.UpdatedAt,
-		&user.IsDeleted,
-	)
+		&user.UpdatedAt)
 
 	if err != nil {
 		return user, err
@@ -149,9 +144,7 @@ func (u *userRepository) UpdatePassword(id, password string) (entity.User, error
 			&user.RoleId,
 			&user.RoleName,
 			&user.CreatedAt,
-			&user.UpdatedAt,
-			&user.IsDeleted,
-		)
+			&user.UpdatedAt)
 
 	if err != nil {
 		return user, err
