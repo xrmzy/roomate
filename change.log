@@ -1,0 +1,4 @@
+- generate new key pair for jwt, and use Asymmetric digital signature algorithm
+- hide user password when create user
+- edit message when user loged in
+- fix get booking
