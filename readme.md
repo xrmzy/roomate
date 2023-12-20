@@ -22,7 +22,7 @@ git clone https://link-to-project
 
 ## Environment variables
 <details>
-<summary>Variables Defined in the project </>
+<summary>Variables Defined in the project
 
     | Key                       | Value                    | Desc                                        |
     | ------------------------- | ------------------------ | ------------------------------------------- |
