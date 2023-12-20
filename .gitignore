@@ -7,7 +7,6 @@
 *.test
 *.out
 *.work
-makefile
-*.log
+logger.log
 *.pem
 .env

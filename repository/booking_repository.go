@@ -95,10 +95,11 @@ func (b *bookingRepository) GetAll(limit, offset int) ([]entity.Booking, error) 
 
 func (b *bookingRepository) getAllBookingDetails(bookingID string) ([]entity.BookingDetail, error) {
 	var bookingDetails []entity.BookingDetail
-	rows, err := b.db.Query(query.GetAllBookingDetails, bookingID)
+	rows, err := b.db.Query(query.GetBookingDetail, bookingID)
 	if err != nil {
 		return bookingDetails, err
 	}
+
 	defer rows.Close()
 
 	for rows.Next() {
@@ -130,7 +131,7 @@ func (b *bookingRepository) getAllBookingDetails(bookingID string) ([]entity.Boo
 
 func (b *bookingRepository) getAllBookingDetailServices(bookingDetailID string) ([]entity.BookingDetailService, error) {
 	var services []entity.BookingDetailService
-	rows, err := b.db.Query(query.GetAllBookingDetailServices, bookingDetailID)
+	rows, err := b.db.Query(query.GetBookingDetailService, bookingDetailID)
 	if err != nil {
 		return services, err
 	}

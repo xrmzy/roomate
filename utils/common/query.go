@@ -45,17 +45,15 @@ const (
 	GetAllBookings = `SELECT id, night, check_in, check_out, user_id, customer_id, is_agree, information, total_price, created_at, updated_at FROM bookings WHERE is_deleted = false ORDER BY id LIMIT $1 OFFSET $2`
 
 	// Booking Detail
-	CreateBookingDetail  = `INSERT INTO booking_details (booking_id, room_id, sub_total, updated_at) VALUES ($1, $2, $3, $4) RETURNING id, booking_id, room_id, sub_total, created_at, updated_at`
-	GetBookingDetail     = `SELECT id, booking_id, room_id, sub_total, created_at, updated_at FROM booking_details WHERE booking_id = $1 AND is_deleted = false`
-	UpdateBookingDetail  = `UPDATE booking_details SET sub_total = $2, updated_at = $3 WHERE id = $1 AND is_deleted = false RETURNING id, booking_id, room_id, sub_total, created_at, updated_at`
-	DeleteBookingDetail  = `UPDATE booking_details SET is_deleted = true WHERE id = $1`
-	GetAllBookingDetails = `SELECT id, booking_id, room_id, sub_total, created_at, updated_at FROM booking_details WHERE is_deleted = false`
+	CreateBookingDetail = `INSERT INTO booking_details (booking_id, room_id, sub_total, updated_at) VALUES ($1, $2, $3, $4) RETURNING id, booking_id, room_id, sub_total, created_at, updated_at`
+	GetBookingDetail    = `SELECT id, booking_id, room_id, sub_total, created_at, updated_at FROM booking_details WHERE booking_id = $1 AND is_deleted = false`
+	UpdateBookingDetail = `UPDATE booking_details SET sub_total = $2, updated_at = $3 WHERE id = $1 AND is_deleted = false RETURNING id, booking_id, room_id, sub_total, created_at, updated_at`
+	DeleteBookingDetail = `UPDATE booking_details SET is_deleted = true WHERE id = $1`
 
 	// Booking Detail Service
-	CreateBookingDetailService  = `INSERT INTO booking_detail_services (booking_detail_id, service_id, service_name, updated_at) VALUES ($1, $2, $3, $4) RETURNING id, booking_detail_id, service_id, service_name, created_at, updated_at`
-	GetBookingDetailService     = `SELECT id, booking_detail_id, service_id, service_name, created_at, updated_at, FROM booking_detail_services WHERE id = $1 AND is_deleted = false`
-	DeleteBookingDetailService  = `UPDATE booking_detail_services SET is_deleted = true WHERE id = $1`
-	GetAllBookingDetailServices = `SELECT id, booking_detail_id, service_id, created_at, updated_at FROM booking_detail_services WHERE is_deleted = false`
+	CreateBookingDetailService = `INSERT INTO booking_detail_services (booking_detail_id, service_id, service_name, updated_at) VALUES ($1, $2, $3, $4) RETURNING id, booking_detail_id, service_id, service_name, created_at, updated_at`
+	GetBookingDetailService    = `SELECT id, booking_detail_id, service_id, service_name, created_at, updated_at FROM booking_detail_services WHERE id = $1 AND is_deleted = false`
+	DeleteBookingDetailService = `UPDATE booking_detail_services SET is_deleted = true WHERE id = $1`
 )
 
 // custom queries
