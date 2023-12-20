@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	middlewaremock "roomate/mock/middleware_mock"
 	usecasemock "roomate/mock/usecase_mock"
-	"roomate/model/dto"
 	"roomate/model/entity"
 	"testing"
 	"time"
@@ -67,21 +66,21 @@ var dummyBooking = entity.Booking{
 	IsDeleted:  false,
 }
 
-var mockPayload = dto.CreateBookingParams{
-	CheckIn:    "20-12-2023",
-	CheckOut:   "23-12-2023",
-	UserId:     "1",
-	CustomerId: "1",
-	BookingDetails: []entity.BookingDetail{
-		{
-			Services: []entity.BookingDetailService{
-				{
-					Id: "1",
-				},
-			},
-		},
-	},
-}
+// var mockPayload = dto.CreateBookingParams{
+// 	CheckIn:    "20-12-2023",
+// 	CheckOut:   "23-12-2023",
+// 	UserId:     "1",
+// 	CustomerId: "1",
+// 	BookingDetails: []entity.BookingDetail{
+// 		{
+// 			Services: []entity.BookingDetailService{
+// 				{
+// 					Id: "1",
+// 				},
+// 			},
+// 		},
+// 	},
+// }
 
 var mockTokenJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDI3OTExMzcsImlhdCI6MTcwMjcwNDczNywidXNlcklkIjoiZmI5ZWJkYTUtZjE5MS00MzA0LTljZWYtODdiOWQyOWM3YjY4Iiwicm9sZSI6IkFkbWluIn0.jg71NzO_UCb2MQXE_R12AnM_gwmEP9n7VkktL1Y2hxs"
 

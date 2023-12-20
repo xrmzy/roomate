@@ -28,7 +28,6 @@ func (r *roleRepository) Get(id string) (entity.Role, error) {
 			&role.CreatedAt,
 			&role.UpdatedAt,
 		)
-
 	if err != nil {
 		return role, err
 	}
@@ -44,6 +43,8 @@ func (r *roleRepository) GetAll(limit, offset int) ([]entity.Role, error) {
 		return roles, err
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		var role entity.Role
 		err := rows.Scan(
@@ -52,7 +53,6 @@ func (r *roleRepository) GetAll(limit, offset int) ([]entity.Role, error) {
 			&role.CreatedAt,
 			&role.UpdatedAt,
 		)
-
 		if err != nil {
 			return roles, err
 		}
@@ -73,7 +73,6 @@ func (r *roleRepository) Create(role entity.Role) (entity.Role, error) {
 		&role.CreatedAt,
 		&role.UpdatedAt,
 	)
-
 	if err != nil {
 		return role, err
 	}
@@ -92,7 +91,6 @@ func (r *roleRepository) Update(id string, role entity.Role) (entity.Role, error
 		&role.CreatedAt,
 		&role.UpdatedAt,
 	)
-
 	if err != nil {
 		return role, err
 	}

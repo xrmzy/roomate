@@ -1,7 +1,13 @@
 *.sum
-*.env
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
 *.work
-*.work.sum
 makefile
 *.log
 *.pem
+.env

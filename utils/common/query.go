@@ -6,14 +6,14 @@ const (
 	// update user without updating password
 	UpdateUser  = `UPDATE users SET name = $2, email = $3, role_id = $4, role_name = $5, updated_at = $6 WHERE id = $1 AND is_deleted = false RETURNING id, name, email, role_id, role_name, created_at, updated_at`
 	DeleteUser  = `UPDATE users SET is_deleted = true WHERE id = $1`
-	GetUser     = `SELECT id, name, email, role_id, role_name, created_at, updated_at FROM users WHERE id = $1 AND is_deleted = false`
+	GetUser     = `SELECT id, name, email, role_id, role_name, created_at, updated_at FROM users WHERE id = $1`
 	GetAllUsers = `SELECT id, name, email, role_id, role_name, created_at, updated_at FROM users WHERE is_deleted = false ORDER BY id LIMIT $1 OFFSET $2`
 
 	// Role
 	CreateRole  = `INSERT INTO roles (role_name, updated_at) VALUES ($1, $2) RETURNING id, role_name, created_at, updated_at`
 	UpdateRole  = `UPDATE roles SET role_name = $2, updated_at = $3 WHERE id = $1 AND is_deleted = false RETURNING id, role_name, created_at, updated_at`
 	DeleteRole  = `UPDATE roles SET is_deleted = true WHERE id = $1`
-	GetRole     = `SELECT id, role_name, created_at, updated_at FROM roles WHERE id = $1 AND is_deleted = false`
+	GetRole     = `SELECT id, role_name, created_at, updated_at FROM roles WHERE id = $1`
 	GetAllRoles = `SELECT id, role_name, created_at, updated_at FROM roles WHERE is_deleted = false ORDER BY id LIMIT $1 OFFSET $2`
 
 	// Customer
@@ -61,7 +61,7 @@ const (
 // custom queries
 const (
 	GetRoleName         = `SELECT role_name FROM roles WHERE id = $1 AND is_deleted = false`
-	GetByEmail          = `SELECT id, role_name, password FROM users WHERE email = $1 AND is_deleted = false`
+	GetByEmail          = `SELECT id, role_name, password FROM users WHERE email = $1`
 	UpdatePassword      = `UPDATE users SET password = $2 WHERE id = $1 AND is_deleted = false RETURNING id, name, email, role_id, role_name, created_at, updated_at`
 	UpdateBookingStatus = `UPDATE bookings SET is_agree = $2, information = $3 WHERE id = $1 AND is_deleted = false RETURNING id, night, check_in, check_out, user_id, customer_id, is_agree, information, total_price, created_at, updated_at`
 	UpdateRoomStatus    = `UPDATE rooms SET status = 'booked' WHERE id = $1`
