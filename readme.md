@@ -20,39 +20,23 @@ Install roomate with git clone
 git clone https://link-to-project
 ```
 
+## Environment variables
+<details>
+    <summary>Variables Defined in the project </>
 
-## Configuration
+| Key                       | Value                    | Desc                                        |
+| ------------------------- | ------------------------ | ------------------------------------------- |
+| `API_PORT`                | `5000`                   | Port at which app runs                      |
+| `DB_USER`                 | `username`               | Database Username                           |
+| `DB_PASS`                 | `password`               | Database Password                           |
+| `DB_HOST`                 | `0.0.0.0`                | Database Host                               |
+| `DB_PORT`                 | `3000`                   | Database Port                               |
+| `DB_NAME`                 | `test`                   | Database Name                               |
+| `ACCESS_TOKEN_KEY`        | `secret`                 | Authentication                              |
 
-To run this project, you will need to add the following environment variables to your .env file
+</details>
 
-`API_PORT=1111`
-
-`DB_HOST=localhost`
-
-`DB_PORT=5432`
-
-`DB_NAME=db_roomate`
-
-`DB_USER=root`
-
-`DB_PASSWORD=root`
-
-`DB_DRIVER=postgres`
-
-
-`ACCESS_TOKEN_PRIVATE_KEY = GET THIS WHEN YOU CREATE USER`
-
-`ACCESS_TOKEN_EXPIRED_IN=15m`
-
-`ACCESS_TOKEN_MAXAGE=15`
-
-`REFRESH_TOKEN_PRIVATE_KEY= GET THIS WHEN YOU RUN OUT OF TIME`
-
-`REFRESH_TOKEN_EXPIRED_IN=60m`
-
-`REFRESH_TOKEN_MAXAGE=60`
-
-## Run Locally
+### Run Locally
 
 Clone the project
 
@@ -203,6 +187,20 @@ To deploy this project to docker
 ```
 
 
+## Implemented Features
+- Routing (gin web framework)
+- Environment Files
+- Logging (logrus)
+- Middlewares
+- Database Setup (posgresql)
+- Models Setup
+- Repositories
+- Implementing Basic CRUD Operation
+- Authentication (JWT)
+- Google sheet APi (downloading booking reports)
+- Dockerize Application
+- Unit testing
+
 ## Authors
 
 - [@imkhoirularifin](https://github.com/imkhoirularifin)
@@ -210,11 +208,12 @@ To deploy this project to docker
 - [@maiing11 ](https://github.com/maiing11)
 - [@Dimazz](https://github.com/Dimazzs)
 
-
+## Todos
+- [] File Upload Middleware examples. https://github.com/example
 
 ## Contributing
 
-Contributions are always welcome!
+Please open issues if you want the template to add some features that is not in todos. 🙇‍♂️
 
 See `contributing.md` for ways to get started.
 
