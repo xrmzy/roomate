@@ -86,6 +86,8 @@ func (u *userUseCase) CreateUser(user entity.User) (entity.User, error) {
 		return user, err
 	}
 
+	user.Password = ""
+
 	return user, nil
 }
 

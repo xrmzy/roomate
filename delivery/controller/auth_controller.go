@@ -35,18 +35,18 @@ func (a *authController) loginHandler(ctx *gin.Context) {
 		return
 	}
 
-	common.SendSingleResponse(ctx, http.StatusOK, "user logged in", response)
+	common.SendSingleResponse(ctx, http.StatusOK, "successfully logged in", response)
 }
 
 func (a *authController) refreshTokenHandler(ctx *gin.Context) {
 	tokenString := strings.Replace(ctx.GetHeader("Authorization"), "Bearer ", "", -1)
 	newToken, err := a.jwtService.RefreshToken(tokenString)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	common.SendSingleResponse(ctx, http.StatusOK, "token refreshed", newToken)
+	common.SendSingleResponse(ctx, http.StatusOK, "successfully generate new token", newToken)
 }
 
 func (a *authController) Route() {

@@ -26,7 +26,8 @@ type FileConfig struct {
 }
 
 type TokenConfig struct {
-	JwtSignatureKey []byte
+	JwtPrivateKey   string
+	JwtPublicKey    string
 	JwtLifeTime     time.Duration
 }
 
@@ -69,7 +70,8 @@ func (c *Config) readConfig() error {
 	}
 
 	c.TokenConfig = TokenConfig{
-		JwtSignatureKey: []byte(os.Getenv("JWT_SIGNATURE_KEY")),
+		JwtPrivateKey:   os.Getenv("JWT_PRIVATE_KEY"),
+		JwtPublicKey:    os.Getenv("JWT_PUBLIC_KEY"),
 		JwtLifeTime:     tokenLifeTime,
 	}
 
@@ -77,7 +79,6 @@ func (c *Config) readConfig() error {
 		ServiceAccountKey: os.Getenv("SERVICE_ACCOUNT_KEY"),
 		SpreadsheetId:     os.Getenv("SPREADSHEET_ID"),
 	}
-
 
 	if c.ApiConfig.ApiPort == "" || c.DbConfig.Driver == "" || c.DbConfig.Host == "" || c.DbConfig.DbName == "" || c.DbConfig.Port == "" || c.DbConfig.Username == "" || c.DbConfig.Password == "" {
 		return errors.New("all environment variables required")

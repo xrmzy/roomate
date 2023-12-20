@@ -144,14 +144,14 @@ func (suite *BookingRepoTestSuite) TestRepository_GetBooking() {
 			"id", "booking_id", "room_id", "sub_total", "created_at", "updated_at",
 		}).AddRow(i.Id, i.BookingId, i.RoomId, i.SubTotal, i.CreatedAt, i.UpdatedAt)
 
-		suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.GetAllBookingDetails)).WithArgs(i.BookingId).WillReturnRows(detailRows)
+		suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.GetBookingDetail)).WithArgs(i.BookingId).WillReturnRows(detailRows)
 
 		for _, j := range i.Services {
 			serviceRows := sqlmock.NewRows([]string{
 				"id", "booking_detail_id", "service_id", "service_name", "created_at", "updated_at",
 			}).AddRow(j.Id, j.BookingDetailId, j.ServiceId, j.ServiceName, j.CreatedAt, j.UpdatedAt)
 
-			suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.GetAllBookingDetailServices)).WithArgs(i.Id).WillReturnRows(serviceRows)
+			suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.GetBookingDetailService)).WithArgs(i.Id).WillReturnRows(serviceRows)
 		}
 	}
 
@@ -183,14 +183,14 @@ func (suite *BookingRepoTestSuite) TestRepository_GetAllBookings() {
 			"id", "booking_id", "room_id", "sub_total", "created_at", "updated_at",
 		}).AddRow(i.Id, i.BookingId, i.RoomId, i.SubTotal, i.CreatedAt, i.UpdatedAt)
 
-		suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.GetAllBookingDetails)).WithArgs(i.BookingId).WillReturnRows(detailRows)
+		suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.GetBookingDetail)).WithArgs(i.BookingId).WillReturnRows(detailRows)
 
 		for _, j := range i.Services {
 			serviceRows := sqlmock.NewRows([]string{
 				"id", "booking_detail_id", "service_id", "service_name", "created_at", "updated_at",
 			}).AddRow(j.Id, j.BookingDetailId, j.ServiceId, j.ServiceName, j.CreatedAt, j.UpdatedAt)
 
-			suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.GetAllBookingDetailServices)).WithArgs(i.Id).WillReturnRows(serviceRows)
+			suite.sqlmock.ExpectQuery(regexp.QuoteMeta(common.GetBookingDetailService)).WithArgs(i.Id).WillReturnRows(serviceRows)
 		}
 	}
 
