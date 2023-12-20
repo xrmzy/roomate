@@ -21,18 +21,19 @@ git clone https://link-to-project
 ```
 
 ## Environment variables
-<details>
-    <summary>Variables Defined in the project </>
 
-| Key                       | Value                    | Desc                                        |
-| ------------------------- | ------------------------ | ------------------------------------------- |
-| `API_PORT`                | `5000`                   | Port at which app runs                      |
-| `DB_USER`                 | `username`               | Database Username                           |
-| `DB_PASS`                 | `password`               | Database Password                           |
-| `DB_HOST`                 | `0.0.0.0`                | Database Host                               |
-| `DB_PORT`                 | `3000`                   | Database Port                               |
-| `DB_NAME`                 | `test`                   | Database Name                               |
-| `ACCESS_TOKEN_KEY`        | `secret`                 | Authentication                              |
+<details>
+    <summary>Variables Defined in the project </summary>
+
+    | Key                       | Value                    | Desc                                        |
+    | ------------------------- | ------------------------ | ------------------------------------------- |
+    | `API_PORT`                | `5000`                   | Port at which app runs                      |
+    | `DB_USER`                 | `username`               | Database Username                           |
+    | `DB_PASS`                 | `password`               | Database Password                           |
+    | `DB_HOST`                 | `0.0.0.0`                | Database Host                               |
+    | `DB_PORT`                 | `3000`                   | Database Port                               |
+    | `DB_NAME`                 | `test`                   | Database Name                               |
+    | `ACCESS_TOKEN_KEY`        | `secret`                 | Authentication                              |
 
 </details>
 
