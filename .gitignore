@@ -10,3 +10,4 @@
 logger.log
 *.pem
 .env
+.key
