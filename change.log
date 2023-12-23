@@ -1,1 +1,2 @@
-- add .env and .key to git ignore
+- remove .env and *.key from project
+- add env.development and env.local
