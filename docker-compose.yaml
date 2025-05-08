@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  # database service
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=167916
+      - POSTGRES_DB=roomate
+    ports:
+      - "5432:5432"
+    volumes:
+      - my-volume:/var/lib/postgresql/data
+  # api service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_SOURCE=postgresql://root:167916@postgres:5432/roomate?sslmode=disable
+    depends_on:
+      - postgres
+    entrypoint: ["/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
+    command: ["/app/main"]
+volumes:
+  my-volume:
